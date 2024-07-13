@@ -1,0 +1,352 @@
+/* 전체 컨테이너 */
+.container {
+  text-align: center;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* 상단 네비게이션 바 */
+.top-nav {
+  position: relative;
+  width: 100%;
+  height: 100px;
+  border-bottom: 1px solid rgb(21, 21, 21);
+  box-sizing: border-box;
+  padding-top: 1.3vh;
+  z-index: 800;
+  background-color: #fff;
+}
+
+/* 로고 영역 */
+.top-logo-area {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70px;
+  height: 70px;
+}
+
+.top-logo-area > a {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.top-logo-area > a > img {
+  width: 100%;
+  height: 100%;
+}
+
+/* 네비게이션 버튼들 */
+.top-nav-btns {
+  position: absolute;
+  top: 10px; /* 조정 */
+  left: 0;
+  width: 100%;
+  height: 10vh; /* 조정 */
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: 2vh 5vw 0.5vh 5vw; /* 조정 */
+}
+
+.top-nav-btns > p {
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+}
+
+.menu-active-btn {
+  padding-top: 1vh; /* 조정 */
+}
+
+.login-active-btn > img {
+  width: 80%;
+  height: 100%;
+}
+
+.menu-active-btn > img {
+  width: 60%;
+  height: 60%;
+}
+
+/* 사이드 메뉴 */
+.side-menu-area {
+  position: absolute;
+  top: 0;
+  width: 290px;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 메인 메뉴 박스 */
+.main-menu-box {
+  z-index: 900;
+  position: absolute;
+  top: 0;
+  width: 180px;
+  height: 100%;
+  padding-top: 15vh;
+  padding-left: 40px;
+  padding-right: 40px;
+  box-sizing: border-box;
+  background-color: #fff;
+  border-right: 1px solid black;
+}
+
+/* 메인 메뉴 버튼 */
+.main-menu-btns {
+  position: relative;
+  width: 100px;
+  height: 60px;
+  font-size: 16pt;
+  border: 1px solid black;
+  border-radius: 30px;
+  margin-bottom: 4vh;
+}
+
+.main-menu-btns:hover {
+  color: #fff;
+  background-color: black;
+}
+
+/* 서브 메뉴 박스 */
+.sub-menu-box {
+  position: absolute;
+  visibility: hidden;
+  opacity: 0;
+  left: 100%;
+  font-size: 14pt;
+  padding-left: 40px;
+  width: 140px;
+  box-sizing: border-box;
+  transition: visibility 0s, opacity 0.3s ease;
+}
+
+.closet-btn:hover .sub-menu-box {
+  top: -280%;
+  visibility: visible;
+  opacity: 1;
+  height: 100vh;
+  border-right: 1px solid black;
+}
+
+/* 서브 메뉴 버튼 */
+.sub-menu-btns {
+  position: relative;
+  right: 0;
+  width: 100px;
+  height: 50px;
+  color: black;
+  border-bottom: 1px solid black;
+}
+
+.sub-menu-btns:hover {
+  color: #fff;
+  background-color: black;
+}
+
+.main-menu-btns > a {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  line-height: 3em;
+}
+
+.sub-menu-btns > a {
+  text-align: center;
+  line-height: 2.5em;
+}
+
+.menu-close-btn {
+  position: relative;
+  top: 600px;
+  left: 26%;
+  z-index: 999;
+  width: 30px;
+}
+
+.menu-close-btn > img {
+  width: 100%;
+}
+
+/* =======================================
+========================================== 
+========================================== 
+========================================== 
+========================================== 
+========================================== */
+
+/* 콘텐츠 영역 */
+.content-area {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  padding: 2.5% 3.65%;
+  box-sizing: border-box;
+}
+
+.sort-search-area {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  height: 5%;
+  margin-bottom: 2.5%;
+}
+
+.sort-search-area-narrow {
+  position: relative;
+  left: 12%;
+  height: 5%;
+  margin-bottom: 2.5%;
+  width: 83%;
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: 0 3%;
+}
+
+.sort-box {
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: 0.8% 3.5%;
+  position: relative;
+  width: 20%;
+  height: 100%;
+}
+.sort-btns {
+  font-size: 16pt;
+}
+
+.search-box {
+  position: relative;
+  box-sizing: border-box;
+  width: 30%;
+
+  height: 100%;
+}
+
+.search-bar {
+  position: relative;
+  right: -18%;
+  top: -9%;
+  width: 20%;
+  height: 100%;
+  box-sizing: border-box;
+  background-color: #fff;
+  padding: 1%;
+  border: 1px solid black;
+  border-radius: 30px;
+  text-align: center;
+  transition: width 0.5s ease-in-out;
+}
+
+.search-bar:hover {
+  width: 70%;
+}
+.search-btn {
+  position: relative;
+  right: -10%;
+  width: 8%;
+  height: 90%;
+  border: 1px solid black;
+  background-color: #fff;
+  border-radius: 100%;
+}
+
+.content-box {
+  display: flex;
+  flex-wrap: wrap;
+  height: 100%;
+  gap: 20px;
+  overflow-y: scroll;
+  justify-content: center; /* 가운데 정렬 */
+}
+
+.content-item {
+  flex: 0 1 calc(25% - 20px); /* 가로 간격을 고려하여 설정 */
+  height: 550px;
+  background-color: #f0f0f0;
+  border-radius: 15px;
+  margin-bottom: 20px; /* 아래 여백 추가 */
+}
+
+.content-box-narrow {
+  position: relative;
+  display: flex;
+  width: 84%;
+  flex-wrap: wrap;
+  height: 100%;
+  overflow-y: scroll;
+  gap: 20px;
+  justify-content: center; /* 가운데 정렬 */
+}
+
+.content-box-narrow > .content-item {
+  flex: 0 1 calc(30% - 20px);
+  height: 550px;
+  background-color: #f0f0f0;
+  border-radius: 15px;
+  margin-bottom: 30px; /* 아래 여백 추가 */
+}
+
+.content-item:last-child {
+  margin-bottom: 15%;
+}
+
+@media (min-width: 1700px) and (max-width: 1920px) {
+  .content-box-narrow {
+    left: 12%; /* 1200px 이하에서 가운데 정렬을 위한 왼쪽 마진 조정 */
+  }
+  .content-item {
+    flex: 0 1 calc(25% - 20px); /* 너비 조정 */
+  }
+
+  .content-box-narrow > .content-item {
+    flex: 0 1 calc(33% - 20px);
+  }
+}
+
+@media (min-width: 1400px) and (max-width: 1600px) {
+  .content-box-narrow {
+    left: 15%; /* 1200px 이하에서 가운데 정렬을 위한 왼쪽 마진 조정 */
+  }
+  .content-item {
+    flex: 0 1 calc(25% - 20px); /* 너비 조정 */
+  }
+  .content-box-narrow > .content-item {
+    flex: 0 1 calc(33% - 20px);
+  }
+
+  .sort-search-area-narrow {
+    width: 80%;
+    left: 16%;
+  }
+
+  .sort-btns {
+    font-size: 14pt;
+  }
+}
+
+@media (max-width: 768px) {
+  .content-box-narrow {
+    margin-left: 6%; /* 768px 이하에서 가운데 정렬을 위한 왼쪽 마진 조정 */
+  }
+  .content-item {
+    flex: 0 1 calc(45% - 20px); /* 너비 조정 */
+  }
+}
+
+@media (max-width: 480px) {
+  .content-box-narrow {
+    margin-left: 0; /* 480px 이하에서 가운데 정렬을 위한 왼쪽 마진 조정 해제 */
+  }
+  .content-item {
+    flex: 0 1 calc(100% - 20px); /* 너비 조정 */
+  }
+}
