@@ -27,7 +27,7 @@ function Login({ setModal }) {
       setModal(false);
     } catch (error) {
       console.error("로그인 실패", error.response.data);
-      // 로그인 실패 시 에러 메시지를 설정합니다.
+      // 로그인 실패 시 에러 메시지
       setVMsg("로그인 실패: " + error.response.data.message);
     }
   };

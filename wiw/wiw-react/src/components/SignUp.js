@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import "../assets/styles/LoginSignUp.css";
 
-import { useSelector, useDispatch } from "react-redux";
+//import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
-import { setUser } from "../store/slices/userSlice";
+//import { setUser } from "../store/slices/userSlice";
 
 function SignUp({ setModal }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [vMsg, setVMsg] = useState("");
-  const dispatch = useDispatch();
-  const setUserInfo = useSelector((state) => state.user.user);
+  //   const dispatch = useDispatch();
+  //   const setUserInfo = useSelector((state) => state.user.user);
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -21,13 +21,13 @@ function SignUp({ setModal }) {
         password, // 비밀번호
       });
 
-      setVMsg("로그인 성공!");
+      setVMsg("회원가입 성공!");
 
       // 회원가입 성공 시 모달 닫기
       setModal(false);
     } catch (error) {
       console.error("회원가입 실패", error.response.data);
-      // 로그인 실패 시 에러 메시지를 설정합니다.
+      // 회원가입 실패 시 에러 메시지
       setVMsg("회원가입 실패: " + error.response.data.message);
     }
   };
@@ -50,7 +50,7 @@ function SignUp({ setModal }) {
           </p>
         </div>
         <form className="modal-box" onSubmit={handleSubmit}>
-          <h4 className="modal-text-info">로그인</h4>
+          <h4 className="modal-text-info">회원가입</h4>
           <input
             className="user-input"
             name="username"
@@ -59,6 +59,8 @@ function SignUp({ setModal }) {
             onChange={(e) => setUsername(e.target.value)}
             pattern="[A-Za-z0-9]+"
             title="영문자와 숫자만 입력 가능합니다."
+            minlength="8"
+            maxlength="20"
             required
           />
           <input
@@ -70,6 +72,8 @@ function SignUp({ setModal }) {
             onChange={(e) => setPassword(e.target.value)}
             pattern="[A-Za-z0-9]+"
             title="영문자와 숫자만 입력 가능합니다. "
+            minlength="8"
+            maxlength="20"
             required
           />
           <button type="submit" className="submit-btn">
