@@ -89,34 +89,6 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "wiw-react/build/index.html"));
 });
 
-//로그인
-app.post("/login", async (req, res, next) => {
-  passport.authenticate("local", (err, user, info) => {
-    if (err) {
-      return res.status(500).json({ message: "서버 오류", error: err });
-    }
-    if (!user) {
-      return res.status(401).json({ message: info.message || "로그인 실패" });
-    }
-    req.logIn(user, (err) => {
-      if (err) {
-        return res
-          .status(500)
-          .json({ message: "로그인 세션 설정 오류", error: err });
-      }
-      console.log(new ObjectId(req.session.passport.user.user_id));
-      //세션 정보를 담은 변수 userInfo
-      const userInfo = {
-        userId: user._id,
-        username: user.username,
-      };
-      console.log(userInfo);
-
-      return res.status(200).json({ message: "로그인 성공!", userInfo });
-    });
-  })(req, res, next);
-});
-
 //회원가입
 
 app.post(
@@ -162,6 +134,49 @@ app.post(
     }
   }
 );
+
+//로그인
+app.post("/login", async (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) {
+      return res.status(500).json({ message: "서버 오류", error: err });
+    }
+    if (!user) {
+      return res.status(401).json({ message: info.message || "로그인 실패" });
+    }
+    req.logIn(user, (err) => {
+      if (err) {
+        return res
+          .status(500)
+          .json({ message: "로그인 세션 설정 오류", error: err });
+      }
+      console.log(new ObjectId(req.session.passport.user.user_id));
+      //세션 정보를 담은 변수 userInfo
+      const userInfo = {
+        userId: user._id,
+        username: user.username,
+      };
+      console.log(userInfo);
+
+      return res.status(200).json({ message: "로그인 성공!", userInfo });
+    });
+  })(req, res, next);
+});
+
+app.post("/logout", (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      return res.status(500).json({ message: "로그아웃 실패", error: err });
+    }
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ message: "세션 삭제 실패", error: err });
+      }
+      res.clearCookie("connect.sid");
+      return res.status(200).json({ message: "로그아웃 성공" });
+    });
+  });
+});
 
 //===============================================================
 //===============================================================

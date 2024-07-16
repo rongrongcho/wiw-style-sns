@@ -71,16 +71,23 @@
   color: rgb(23, 22, 22);
 }
 
-.user-active-btn > img {
-  width: 80%;
-  height: 100%;
+.user-logged-in {
+  background-color: pink;
 }
+
+.member-box {
+  z-index: 999;
+  position: absolute;
+  width: 200px;
+  background-color: red;
+}
+
+/* =================================== */
 
 .menu-active-btn > img {
   width: 60%;
   height: 60%;
 }
-
 /* 사이드 메뉴 */
 .side-menu-area {
   position: absolute;

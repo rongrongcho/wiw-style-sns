@@ -4,6 +4,7 @@ import "../assets/styles/Layout.css";
 import Login from "./Login";
 import SignUp from "./SignUp";
 import Card from "./Card";
+import Logout from "./Logout";
 
 function Layout() {
   // 멤머 모달창 제어 on/off state
@@ -13,12 +14,13 @@ function Layout() {
 
   // 로그인 비로그인 화면 구분
   const setUserInfo = useSelector((state) => state.user.user);
+  // 멤버 기능 활성화 (로그인한 유저)
+  const [showMember, setMember] = useState(false);
 
   // 사이드 메뉴 열기 함수
   function openSideMenu() {
     setSideMenu(true);
   }
-
   // 사이드 메뉴 닫기 함수
   function closeSideMenu() {
     setSideMenu(false);
@@ -47,7 +49,13 @@ function Layout() {
 
             {setUserInfo ? (
               <div className="user-logged-in">
-                <img src="images/loginbtn.png" alt="로그인 유저 이미지" />
+                <img
+                  src="images/loginbtn.png"
+                  alt="로그인 유저 이미지"
+                  onClick={() => {
+                    setMember(true);
+                  }}
+                />
               </div>
             ) : (
               <div className="user-box">
@@ -77,6 +85,20 @@ function Layout() {
       {showModal === "login" && <Login setModal={setModal} />}
       {/* 회원가입 모달 */}
       {showModal === "sign-up" && <SignUp setModal={setModal} />}
+      {/* 멤버기능 모달 */}
+      {showMember && (
+        <div className="member-box">
+          <p
+            className="member-close-btn"
+            onClick={() => {
+              setMember(false);
+            }}
+          >
+            <img src="images/close-btn.png" alt="사이드 메뉴 닫기 버튼" />
+          </p>
+          <Logout />
+        </div>
+      )}
 
       {/* 사이드 메뉴 */}
       {showSideMenu && (
