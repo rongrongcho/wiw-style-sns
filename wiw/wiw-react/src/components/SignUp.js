@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import "../assets/styles/LoginSignUp.css";
+
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { setUser } from "../store/slices/userSlice";
-function Login({ setModal }) {
+
+function SignUp({ setModal }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [vMsg, setVMsg] = useState("");
   const dispatch = useDispatch();
   const setUserInfo = useSelector((state) => state.user.user);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -31,7 +32,6 @@ function Login({ setModal }) {
       setVMsg("로그인 실패: " + error.response.data.message);
     }
   };
-
   return (
     <div className="login-modal">
       <p
@@ -51,7 +51,7 @@ function Login({ setModal }) {
           </p>
         </div>
         <form className="login-box" onSubmit={handleSubmit}>
-          <h4 className="login-text-info">회원가입</h4>
+          <h4 className="login-text-info">로그인</h4>
           <input
             className="login-input"
             name="username"
@@ -79,19 +79,18 @@ function Login({ setModal }) {
           <span className="validation-msg">{vMsg}</span>
         </form>
         <div className="sign-up-info">
-          <span>아직 회원이 아니신가요?</span>
+          <span>이미 회원이신가요?</span>
           <p
             href="/sign-up-modal"
             onClick={() => {
-              setModal("sign-up");
+              setModal("login");
             }}
           >
-            회원가입 하기
+            로그인 하기
           </p>
         </div>
       </div>
     </div>
   );
 }
-
-export default Login;
+export default SignUp;

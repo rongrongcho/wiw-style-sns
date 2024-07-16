@@ -32,6 +32,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 let connectDB = require("./database.js");
+const { ObjectId } = require("mongodb");
 let db;
 
 connectDB
@@ -43,10 +44,21 @@ connectDB
     console.log(err);
   });
 
-app.listen(process.env.PORT, () => {
-  console.log(`http://localhost:${process.env.PORT} 에서 서버 실행 중`);
+passport.serializeUser((user, done) => {
+  process.nextTick(() => {
+    done(null, { user_id: user._id });
+  });
 });
 
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await db.collection("user").findOne({ _id: id });
+    done(null, user);
+  } catch (err) {
+    done(err);
+  }
+});
+//3번 pssport.use 호출
 passport.use(
   new LocalStrategy(async (username, password, done) => {
     try {
@@ -65,27 +77,25 @@ passport.use(
     }
   })
 );
+
+//========================================================
+app.listen(process.env.PORT, () => {
+  console.log(`http://localhost:${process.env.PORT} 에서 서버 실행 중`);
+});
+
 app.get("/", (req, res) => {
+  if (req.isAuthenticated()) {
+    console.log(req.session);
+  } else {
+    console.log("ㄴㄴㄴ");
+  }
   res.sendFile(path.join(__dirname, "wiw-react/build/index.html"));
 });
 
-passport.serializeUser((user, done) => {
-  process.nextTick(() => {
-    done(null, user._id);
-  });
-});
-
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await db.collection("user").findOne({ _id: id });
-    done(null, user);
-  } catch (err) {
-    done(err);
-  }
-});
-
 app.post("/login", async (req, res, next) => {
+  // 1번
   passport.authenticate("local", (err, user, info) => {
+    //Authenticate 호출
     if (err) {
       return res.status(500).json({ message: "서버 오류", error: err });
     }
@@ -98,11 +108,17 @@ app.post("/login", async (req, res, next) => {
           .status(500)
           .json({ message: "로그인 세션 설정 오류", error: err });
       }
-      return res.status(200).json({ message: "로그인 성공!" });
+      console.log(new ObjectId(req.session.passport.user.user_id));
+      //세션 정보를 담은 변수 userInfo
+      const userInfo = {
+        userId: user._id,
+        username: user.username,
+      };
+      console.log(userInfo);
+
+      return res.status(200).json({ message: "로그인 성공!", userInfo });
     });
   })(req, res, next);
-  // const hash = await bcrypt.hash(req.body.password, 10);
-  // console.log(hash);
 });
 
 //===============================================================

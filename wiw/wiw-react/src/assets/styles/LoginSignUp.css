@@ -113,18 +113,18 @@
   left: 40%;
 }
 
-.sign-up-info > p {
+.sign-up-info > span {
   font-size: 20pt;
   font-weight: bold;
   margin-bottom: 5px;
 }
 
-.sign-up-info > a {
+.sign-up-info > p {
   font-size: 18pt;
   color: rgb(75, 75, 75);
   font-weight: bold;
 }
 
-.sign-up-info > a:hover {
+.sign-up-info > p:hover {
   color: rgb(27, 27, 27);
 }

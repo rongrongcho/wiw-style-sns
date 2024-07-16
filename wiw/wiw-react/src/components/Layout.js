@@ -3,11 +3,12 @@ import { Routes, Route, Link } from "react-router-dom";
 import "../assets/styles/Layout.css";
 import axios from "axios";
 import Login from "./Login";
+import SignUp from "./SignUp";
 import Card from "./Card";
 
 function Layout() {
-  // 로그인 모달창 제어 on/off state
-  const [showModal, setModal] = useState(false);
+  // 멤머 모달창 제어 on/off state
+  const [showModal, setModal] = useState(null);
   // 사이드 메뉴 제어 on/off state
   const [showSideMenu, setSideMenu] = useState(false);
 
@@ -43,17 +44,30 @@ function Layout() {
             </p>
             <p
               onClick={() => {
-                setModal(true);
+                setModal("login");
               }}
               className="login-active-btn"
             >
-              <img src="images/loginbtn.png" alt="로그인 활성화 버튼" />
+              {/* <img src="images/loginbtn.png" alt="로그인 활성화 버튼" /> */}
+              login
+            </p>
+
+            <p
+              onClick={() => {
+                setModal("sign-up");
+              }}
+              className="login-active-btn"
+            >
+              {/* <img src="images/loginbtn.png" alt="로그인 활성화 버튼" /> */}
+              sign/up
             </p>
           </div>
         </div>
       </nav>
       {/* 로그인 모달 */}
-      {showModal && <Login setModal={setModal} />}
+      {showModal === "login" && <Login setModal={setModal} />}
+      {/* 회원가입 모달 */}
+      {showModal === "sign-up" && <SignUp setModal={setModal} />}
 
       {/* 사이드 메뉴 */}
       {showSideMenu && (
