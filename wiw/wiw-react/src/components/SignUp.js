@@ -1,16 +1,11 @@
 import React, { useState } from "react";
 import "../assets/styles/LoginSignUp.css";
-
-//import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
-//import { setUser } from "../store/slices/userSlice";
 
 function SignUp({ setModal }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [vMsg, setVMsg] = useState("");
-  //   const dispatch = useDispatch();
-  //   const setUserInfo = useSelector((state) => state.user.user);
   const handleSubmit = async (e) => {
     e.preventDefault();
 

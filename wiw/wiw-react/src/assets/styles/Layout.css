@@ -62,7 +62,16 @@
   padding-top: 1vh; /* 조정 */
 }
 
-.login-active-btn > img {
+.user-active-btn {
+  margin-top: 3px;
+  color: rgb(65, 65, 64);
+}
+
+.user-active-btn:hover {
+  color: rgb(23, 22, 22);
+}
+
+.user-active-btn > img {
   width: 80%;
   height: 100%;
 }

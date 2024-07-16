@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Routes, Route, Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import "../assets/styles/Layout.css";
-import axios from "axios";
 import Login from "./Login";
 import SignUp from "./SignUp";
 import Card from "./Card";
@@ -11,6 +10,9 @@ function Layout() {
   const [showModal, setModal] = useState(null);
   // 사이드 메뉴 제어 on/off state
   const [showSideMenu, setSideMenu] = useState(false);
+
+  // 로그인 비로그인 화면 구분
+  const setUserInfo = useSelector((state) => state.user.user);
 
   // 사이드 메뉴 열기 함수
   function openSideMenu() {
@@ -42,25 +44,32 @@ function Layout() {
             <p onClick={openSideMenu} className="menu-active-btn">
               <img src="images/menu_active_btn.png" alt="menu 활성화 버튼" />
             </p>
-            <p
-              onClick={() => {
-                setModal("login");
-              }}
-              className="login-active-btn"
-            >
-              {/* <img src="images/loginbtn.png" alt="로그인 활성화 버튼" /> */}
-              login
-            </p>
 
-            <p
-              onClick={() => {
-                setModal("sign-up");
-              }}
-              className="login-active-btn"
-            >
-              {/* <img src="images/loginbtn.png" alt="로그인 활성화 버튼" /> */}
-              sign/up
-            </p>
+            {setUserInfo ? (
+              <div className="user-logged-in">
+                <img src="images/loginbtn.png" alt="로그인 유저 이미지" />
+              </div>
+            ) : (
+              <div className="user-box">
+                <p
+                  onClick={() => {
+                    setModal("login");
+                  }}
+                  className="user-active-btn"
+                >
+                  login
+                </p>
+
+                <p
+                  onClick={() => {
+                    setModal("sign-up");
+                  }}
+                  className="user-active-btn"
+                >
+                  sign/up
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </nav>
