@@ -18,6 +18,7 @@
     "ejs": "^3.1.10",
     "express": "^4.19.2",
     "express-session": "^1.18.0",
+    "express-validator": "^7.1.0",
     "method-override": "^3.0.0",
     "mongo-db": "^1.0.2",
     "mongodb": "^5.9.2",

@@ -33,7 +33,7 @@ function Login({ setModal }) {
   };
 
   return (
-    <div className="login-modal">
+    <div className="login-sign-modal">
       <p
         className="close-btn"
         onClick={() => {
@@ -50,10 +50,10 @@ function Login({ setModal }) {
             Lets Check WiW!
           </p>
         </div>
-        <form className="login-box" onSubmit={handleSubmit}>
-          <h4 className="login-text-info">회원가입</h4>
+        <form className="modal-box" onSubmit={handleSubmit}>
+          <h4 className="modal-text-info">로그인</h4>
           <input
-            className="login-input"
+            className="user-input"
             name="username"
             placeholder="  아이디(Id)를 입력하세요"
             value={username}
@@ -63,7 +63,7 @@ function Login({ setModal }) {
             required
           />
           <input
-            className="login-input"
+            className="user-input"
             name="password"
             type="password"
             placeholder="  패스워드(Password)를 입력하세요"
@@ -73,7 +73,7 @@ function Login({ setModal }) {
             title="영문자와 숫자만 입력 가능합니다. "
             required
           />
-          <button type="submit" className="login-submit-btn">
+          <button type="submit" className="submit-btn">
             <img src="images/submit-btn-icon.png" alt="제출 버튼" />
           </button>
           <span className="validation-msg">{vMsg}</span>
@@ -81,7 +81,6 @@ function Login({ setModal }) {
         <div className="sign-up-info">
           <span>아직 회원이 아니신가요?</span>
           <p
-            href="/sign-up-modal"
             onClick={() => {
               setModal("sign-up");
             }}

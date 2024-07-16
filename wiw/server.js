@@ -8,6 +8,7 @@ const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const cors = require("cors");
+const { check, validationResult } = require("express-validator");
 require("dotenv").config();
 
 app.use(methodOverride("_method"));
@@ -18,7 +19,7 @@ app.use(cors());
 
 app.use(
   session({
-    secret: "암호화에사용할비밀번호",
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 60 * 60 * 1000 },
@@ -33,6 +34,7 @@ app.use(passport.session());
 
 let connectDB = require("./database.js");
 const { ObjectId } = require("mongodb");
+const { error } = require("console");
 let db;
 
 connectDB
@@ -58,7 +60,7 @@ passport.deserializeUser(async (id, done) => {
     done(err);
   }
 });
-//3번 pssport.use 호출
+
 passport.use(
   new LocalStrategy(async (username, password, done) => {
     try {
@@ -84,18 +86,12 @@ app.listen(process.env.PORT, () => {
 });
 
 app.get("/", (req, res) => {
-  if (req.isAuthenticated()) {
-    console.log(req.session);
-  } else {
-    console.log("ㄴㄴㄴ");
-  }
   res.sendFile(path.join(__dirname, "wiw-react/build/index.html"));
 });
 
+//로그인
 app.post("/login", async (req, res, next) => {
-  // 1번
   passport.authenticate("local", (err, user, info) => {
-    //Authenticate 호출
     if (err) {
       return res.status(500).json({ message: "서버 오류", error: err });
     }
@@ -121,6 +117,53 @@ app.post("/login", async (req, res, next) => {
   })(req, res, next);
 });
 
+//회원가입
+
+app.post(
+  "/register",
+  [
+    check("username")
+      .isAlphanumeric()
+      .withMessage("아이디는 영문자와 숫자만 입력 가능합니다.")
+      .isLength({ min: 8, max: 20 })
+      .withMessage("아이디는 8자 이상 20자 이하로 입력해주세요."),
+    check("password")
+      .isAlphanumeric()
+      .withMessage("비밀번호는 영문자와 숫자만 입력 가능합니다.")
+      .isLength({ min: 8, max: 20 })
+      .withMessage("비밀번호는 8자 이상 20자 이하로 입력해주세요."),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { username, password } = req.body;
+    try {
+      //중복 가입 방지하기
+      const isExistingID = await db.collection("user").findOne({ username });
+      if (isExistingID) {
+        return res.status(400).json({ message: "이미 존재하는 아이디입니다." });
+      }
+      //비밀번호 암호화 해싱처리
+      const hashPwd = await bcrypt.hash(password, 10);
+      //가입하는 계정 정보
+      const newUser = {
+        username,
+        password: hashPwd,
+      };
+      //DB에 저장하기
+      await db.collection("user").insertOne(newUser);
+      return res.status(201).json({ message: "회원가입 성공" });
+    } catch (err) {
+      console.error("회원가입 오류발생", err);
+      return res.status(500).json({ message: "서버오류 발생", error: err });
+    }
+  }
+);
+
+//===============================================================
 //===============================================================
 
 //모들 라우트를 React로 위임
