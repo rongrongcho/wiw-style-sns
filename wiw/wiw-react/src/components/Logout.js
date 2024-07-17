@@ -1,12 +1,10 @@
-import React, { useState } from "react";
-// import "../assets/styles/LoginSignUp.css";
-import { setUser } from "../store/slices/userSlice";
+import React from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { setUser } from "../store/slices/userSlice";
 import axios from "axios";
 
 function Logout({ setMember }) {
   const dispatch = useDispatch();
-  const setUserInfo = useSelector((state) => state.user.user);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -14,13 +12,14 @@ function Logout({ setMember }) {
     try {
       await axios.post("/logout");
       dispatch(setUser(null));
-      setMember(false);
+      setMember(false); // 로그아웃 성공 시 모달 닫기
     } catch (error) {
-      console.error("로그인 실패", error.response.data);
+      console.error("로그아웃 실패", error.response.data);
     }
   };
+
   return (
-    <div>
+    <div className="logout-btn-box">
       <button onClick={handleSubmit}>로그아웃</button>
     </div>
   );

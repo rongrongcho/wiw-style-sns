@@ -11,6 +11,27 @@ const cors = require("cors");
 const { check, validationResult } = require("express-validator");
 require("dotenv").config();
 
+const { S3Client } = require("@aws-sdk/client-s3");
+const multer = require("multer");
+const multerS3 = require("multer-s3");
+const s3 = new S3Client({
+  region: "ap-northeast-2",
+  credentials: {
+    accessKeyId: process.env.IAM_Access_Key,
+    secretAccessKey: process.env.IAM_Secret_Key,
+  },
+});
+
+const upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: process.env.Buket_Name,
+    key: function (요청, file, cb) {
+      cb(null, Date.now().toString()); //업로드시 파일명 변경가능
+    },
+  }),
+});
+
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "wiw-react/build")));
 app.use(express.json());

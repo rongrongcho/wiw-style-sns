@@ -5,6 +5,7 @@ import Login from "./Login";
 import SignUp from "./SignUp";
 import Card from "./Card";
 import Logout from "./Logout";
+import Write from "./Write";
 
 function Layout() {
   // 멤머 모달창 제어 on/off state
@@ -16,6 +17,8 @@ function Layout() {
   const setUserInfo = useSelector((state) => state.user.user);
   // 멤버 기능 활성화 (로그인한 유저)
   const [showMember, setMember] = useState(false);
+
+  const [showWrite, setWrite] = useState(false);
 
   // 사이드 메뉴 열기 함수
   function openSideMenu() {
@@ -96,7 +99,28 @@ function Layout() {
           >
             <img src="images/close-btn.png" alt="사이드 메뉴 닫기 버튼" />
           </p>
-          <Logout />
+          <Logout setMember={setMember} />
+
+          <button
+            onClick={() => {
+              setWrite(true);
+            }}
+          >
+            글쓰기
+          </button>
+          {showWrite && (
+            <div className="wirte-modal">
+              <p
+                className="write-close-btn"
+                onClick={() => {
+                  setWrite(false);
+                }}
+              >
+                <img src="images/close-btn.png" alt="사이드 메뉴 닫기 버튼" />
+              </p>
+              <Write setWrite={setWrite} />
+            </div>
+          )}
         </div>
       )}
 
