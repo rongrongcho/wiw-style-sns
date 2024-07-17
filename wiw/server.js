@@ -112,7 +112,6 @@ app.get("/", (req, res) => {
 });
 
 //회원가입
-
 app.post(
   "/register",
   [
@@ -227,7 +226,6 @@ app.post("/addPost", upload.array("images", 3), async (req, res) => {
     // DB에 post 객체 저장
     await db.collection("post").insertOne(post);
 
-    // 예시: DB 저장 후 응답
     return res.status(200).json({ message: "게시글 등록 성공", post });
   } catch (error) {
     console.error("게시글 등록 실패:", error);
