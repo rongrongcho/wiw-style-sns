@@ -16,6 +16,7 @@ const multer = require("multer");
 const multerS3 = require("multer-s3");
 const s3 = new S3Client({
   region: "ap-northeast-2",
+  endpoint: "https://s3.ap-northeast-2.amazonaws.com",
   credentials: {
     accessKeyId: process.env.IAM_Access_Key,
     secretAccessKey: process.env.IAM_Secret_Key,
@@ -197,6 +198,41 @@ app.post("/logout", (req, res) => {
       return res.status(200).json({ message: "로그아웃 성공" });
     });
   });
+});
+
+// 게시글 등록
+app.post("/addPost", upload.array("images", 3), async (req, res) => {
+  // 업로드된 이미지 정보는 req.files 배열에 저장됨
+  console.log("업로드된 이미지들:", req.files);
+  if (req.files.length === 0) {
+    return res
+      .status(400)
+      .json({ message: "최소 한 장의 이미지를 업로드해야 합니다." });
+  }
+  try {
+    // 해시태그와 사용자 정보
+    const hashtags = JSON.parse(req.body.hashtags);
+    const userInfo = JSON.parse(req.body.userInfo);
+
+    // 게시글 객체 생성
+    const post = {
+      username: userInfo.username,
+      images: req.files.map((file) => ({
+        url: file.location, // S3에 업로드된 파일의 URL 등을 저장
+        postedAt: new Date(),
+        likes: 0, //좋아요
+      })),
+      hashtags: hashtags,
+    };
+    // DB에 post 객체 저장
+    await db.collection("post").insertOne(post);
+
+    // 예시: DB 저장 후 응답
+    return res.status(200).json({ message: "게시글 등록 성공", post });
+  } catch (error) {
+    console.error("게시글 등록 실패:", error);
+    return res.status(500).json({ message: "게시글 등록 실패", error });
+  }
 });
 
 //===============================================================
