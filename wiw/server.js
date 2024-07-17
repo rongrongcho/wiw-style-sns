@@ -219,10 +219,10 @@ app.post("/addPost", upload.array("images", 3), async (req, res) => {
       username: userInfo.username,
       images: req.files.map((file) => ({
         url: file.location, // S3에 업로드된 파일의 URL 등을 저장
-        postedAt: new Date(),
-        likes: 0, //좋아요
       })),
       hashtags: hashtags,
+      postedAt: new Date(),
+      likes: 0, //좋아요
     };
     // DB에 post 객체 저장
     await db.collection("post").insertOne(post);
