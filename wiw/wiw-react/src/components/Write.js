@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { setUser } from "../store/slices/userSlice";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
-import Detail from "./Detail";
 
 function Write({ setWrite }) {
   const dispatch = useDispatch();
@@ -11,6 +10,7 @@ function Write({ setWrite }) {
   const [content, setContent] = useState("");
   const [hashtags, setHashtags] = useState([]);
   const [newTag, setNewTag] = useState("");
+  const [previewPost, setPriPost] = useState(false);
   const [postData, setPostData] = useState(null); // 포스팅 데이터 상태 추가
 
   const handleFileChange = (e) => {
@@ -91,7 +91,7 @@ function Write({ setWrite }) {
 
       setPostData(response.data.post); // 상태 업데이트 함수로 변경
       alert("업로드 성공!");
-
+      setWrite(false);
       setSelectedFiles([]);
       setContent("");
       setHashtags([]);

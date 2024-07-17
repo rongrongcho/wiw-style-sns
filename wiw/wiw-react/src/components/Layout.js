@@ -95,6 +95,7 @@ function Layout() {
             className="member-close-btn"
             onClick={() => {
               setMember(false);
+              setWrite(false);
             }}
           >
             <img src="images/close-btn.png" alt="사이드 메뉴 닫기 버튼" />
