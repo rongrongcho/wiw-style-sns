@@ -9,11 +9,14 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const cors = require("cors");
 const { check, validationResult } = require("express-validator");
+const jwt = require("jsonwebtoken");
+
 require("dotenv").config();
 
 const { S3Client } = require("@aws-sdk/client-s3");
 const multer = require("multer");
 const multerS3 = require("multer-s3");
+
 const s3 = new S3Client({
   region: "ap-northeast-2",
   endpoint: "https://s3.ap-northeast-2.amazonaws.com",
@@ -45,6 +48,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 60 * 60 * 1000 },
+    httpOnly: true, // 클라이언트 측에서 쿠키 접근 방지
     store: MongoStore.create({
       mongoUrl: process.env.DB_URL,
       dbName: process.env.DB_Name,
@@ -70,7 +74,7 @@ connectDB
 
 passport.serializeUser((user, done) => {
   process.nextTick(() => {
-    done(null, { user_id: user._id });
+    done(null, { user_id: user._id, username: user.username });
   });
 });
 
@@ -156,44 +160,68 @@ app.post(
   }
 );
 
-//로그인
-app.post("/login", async (req, res, next) => {
-  passport.authenticate("local", (err, user, info) => {
-    if (err) {
-      return res.status(500).json({ message: "서버 오류", error: err });
-    }
+// 로그인 처리 - JWT 사용
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const user = await db.collection("user").findOne({ username });
     if (!user) {
-      return res.status(401).json({ message: info.message || "로그인 실패" });
+      return res.status(401).json({ message: "아이디가 존재하지 않습니다." });
     }
-    req.logIn(user, (err) => {
-      if (err) {
-        return res
-          .status(500)
-          .json({ message: "로그인 세션 설정 오류", error: err });
-      }
-      console.log(new ObjectId(req.session.passport.user.user_id));
-      //세션 정보를 담은 변수 userInfo
-      const userInfo = {
-        userId: user._id,
-        username: user.username,
-      };
-      console.log(userInfo);
-
-      return res.status(200).json({ message: "로그인 성공!", userInfo });
-    });
-  })(req, res, next);
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "비밀번호가 일치하지 않습니다." });
+    }
+    // JWT 토큰 생성
+    const token = jwt.sign(
+      { userId: user._id, username: user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+    //  전송할 로그인 정보
+    const userInfo = {
+      userId: user._id,
+      username: user.username,
+    };
+    console.log("로그인 성공임?" + username);
+    res.json({ token, userInfo });
+  } catch (err) {
+    console.error("로그인 오류 발생", err);
+    return res.status(500).json({ message: "서버 오류 발생", error: err });
+  }
 });
 
+// 로그인 토큰 검증하기
+
+app.post("/verifyToken", (req, res) => {
+  const { token } = req.body;
+
+  if (!token) {
+    return res.status(400).json({ valid: false, message: "토큰이 없습니다." });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    res.status(200).json({ valid: true, userInfo: decoded });
+  } catch (error) {
+    res
+      .status(401)
+      .json({ valid: false, message: "토큰이 유효하지 않습니다." });
+  }
+});
+
+// 로그아웃
+// 예시: Express 서버에서의 로그아웃 처리
 app.post("/logout", (req, res) => {
-  req.logout((err) => {
+  req.logout(function (err) {
     if (err) {
       return res.status(500).json({ message: "로그아웃 실패", error: err });
     }
-    req.session.destroy((err) => {
+    req.session.destroy(function (err) {
       if (err) {
         return res.status(500).json({ message: "세션 삭제 실패", error: err });
       }
-      res.clearCookie("connect.sid");
+      res.clearCookie("connect.sid"); // 클라이언트 쿠키 삭제
       return res.status(200).json({ message: "로그아웃 성공" });
     });
   });
@@ -230,6 +258,70 @@ app.post("/addPost", upload.array("images", 3), async (req, res) => {
   } catch (error) {
     console.error("게시글 등록 실패:", error);
     return res.status(500).json({ message: "게시글 등록 실패", error });
+  }
+});
+
+// 게시글 목록 조회
+app.get("/api/posts", async (req, res) => {
+  try {
+    const posts = await db.collection("post").find({}).toArray();
+    return res.status(200).json(posts);
+  } catch (error) {
+    console.error("게시글 조회 실패:", error);
+    return res.status(500).json({ message: "게시글 조회 실패", error });
+  }
+});
+
+app.post("/addLikes", async (req, res) => {
+  try {
+    const { username, postId } = req.body;
+    if (!username) {
+      return res
+        .status(401)
+        .json({ message: "로그인 후 이용하실 수 있는 서비스입니다." });
+    }
+
+    const user = await db.collection("user").findOne({ username: username });
+    if (!user) {
+      return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
+    }
+
+    // 유저 객체에 likes 필드가 없으면 초기화
+    if (!user.likes) {
+      user.likes = [];
+    }
+
+    if (user.likes.includes(postId)) {
+      // 좋아요를 이미 누른 경우 - 좋아요 취소
+      await db
+        .collection("post")
+        .updateOne(
+          { _id: new ObjectId(postId) },
+          { $pull: { likes: username } }
+        );
+      await db
+        .collection("user")
+        .updateOne({ username: username }, { $pull: { likes: postId } });
+      console.log("좋아요 취소 ");
+
+      return res.status(200).json({ message: "좋아요가 취소되었습니다." });
+    } else {
+      // 좋아요를 누르지 않은 경우 - 좋아요 추가
+      await db
+        .collection("post")
+        .updateOne(
+          { _id: new ObjectId(postId) },
+          { $addToSet: { likes: username } }
+        );
+      await db
+        .collection("user")
+        .updateOne({ username: username }, { $addToSet: { likes: postId } });
+      console.log("좋아요 추가 ");
+      return res.status(200).json({ message: "좋아요가 추가되었습니다." });
+    }
+  } catch (error) {
+    console.error("좋아요 활동 실패", error);
+    return res.status(500).json({ message: "서버 오류 발생", error });
   }
 });
 

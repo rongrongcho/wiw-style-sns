@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { useSelector } from "react-redux";
 import "../assets/styles/Layout.css";
 import Login from "./Login";
@@ -7,32 +8,47 @@ import Card from "./Card";
 import Logout from "./Logout";
 import Write from "./Write";
 
+// 이미지 및 버튼 텍스트 경로 상수화
+const IMAGES = {
+  LOGO: "images/top-logo-1px.png",
+  MENU_BTN: "images/menu_active_btn.png",
+  LOGIN_BTN: "images/loginbtn.png",
+  CLOSE_BTN: "images/close-btn.png",
+  SEARCH_BTN: "images/search-btn.png",
+};
+
 function Layout() {
-  // 멤머 모달창 제어 on/off state
+  const [posts, setPosts] = useState([]);
   const [showModal, setModal] = useState(null);
-  // 사이드 메뉴 제어 on/off state
   const [showSideMenu, setSideMenu] = useState(false);
-
-  // 로그인 비로그인 화면 구분
-  const setUserInfo = useSelector((state) => state.user.user);
-  // 멤버 기능 활성화 (로그인한 유저)
+  const loginUserInfo = useSelector((state) => state.user.userInfo);
   const [showMember, setMember] = useState(false);
-
   const [showWrite, setWrite] = useState(false);
 
-  // 사이드 메뉴 열기 함수
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get("/api/posts");
+        setPosts(response.data);
+      } catch (error) {
+        console.error("게시글 가져오기 실패:", error);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
   function openSideMenu() {
     setSideMenu(true);
   }
-  // 사이드 메뉴 닫기 함수
+
   function closeSideMenu() {
     setSideMenu(false);
   }
 
-  // Card 컴포넌트 반복문 생성
-  const cards = Array.from({ length: 8 }).map((_, index) => (
+  const cards = posts.map((post, index) => (
     <div key={index} className="content-item">
-      <Card />
+      <Card post={post} />
     </div>
   ));
 
@@ -41,19 +57,19 @@ function Layout() {
       <nav>
         <div className="top-nav">
           <h1 className="top-logo-area">
-            <a href="App.js">
-              <img src="images/top-logo-1px.png" alt="wiw 로고 이미지" />
+            <a href="/">
+              <img src={IMAGES.LOGO} alt="wiw 로고 이미지" />
             </a>
           </h1>
           <div className="top-nav-btns">
             <p onClick={openSideMenu} className="menu-active-btn">
-              <img src="images/menu_active_btn.png" alt="menu 활성화 버튼" />
+              <img src={IMAGES.MENU_BTN} alt="menu 활성화 버튼" />
             </p>
 
-            {setUserInfo ? (
+            {loginUserInfo !== null && loginUserInfo.username ? (
               <div className="user-logged-in">
                 <img
-                  src="images/loginbtn.png"
+                  src={IMAGES.LOGIN_BTN}
                   alt="로그인 유저 이미지"
                   onClick={() => {
                     setMember(true);
@@ -84,11 +100,10 @@ function Layout() {
           </div>
         </div>
       </nav>
-      {/* 로그인 모달 */}
+
       {showModal === "login" && <Login setModal={setModal} />}
-      {/* 회원가입 모달 */}
       {showModal === "sign-up" && <SignUp setModal={setModal} />}
-      {/* 멤버기능 모달 */}
+
       {showMember && (
         <div className="member-box">
           <p
@@ -98,7 +113,7 @@ function Layout() {
               setWrite(false);
             }}
           >
-            <img src="images/close-btn.png" alt="사이드 메뉴 닫기 버튼" />
+            <img src={IMAGES.CLOSE_BTN} alt="사이드 메뉴 닫기 버튼" />
           </p>
           <Logout setMember={setMember} />
 
@@ -110,14 +125,14 @@ function Layout() {
             글쓰기
           </button>
           {showWrite && (
-            <div className="wirte-modal">
+            <div className="write-modal">
               <p
                 className="write-close-btn"
                 onClick={() => {
                   setWrite(false);
                 }}
               >
-                <img src="images/close-btn.png" alt="사이드 메뉴 닫기 버튼" />
+                <img src={IMAGES.CLOSE_BTN} alt="사이드 메뉴 닫기 버튼" />
               </p>
               <Write setWrite={setWrite} />
             </div>
@@ -125,12 +140,11 @@ function Layout() {
         </div>
       )}
 
-      {/* 사이드 메뉴 */}
       {showSideMenu && (
         <div className="side-menu-area">
           <ul className="main-menu-box">
             <li className="main-menu-btns">
-              <a href="App.js">Home</a>
+              <a href="/">Home</a>
             </li>
             <li className="main-menu-btns closet-btn">
               <a href="#">Closet</a>
@@ -151,12 +165,11 @@ function Layout() {
             </li>
           </ul>
           <p className="menu-close-btn" onClick={closeSideMenu}>
-            <img src="images/close-btn.png" alt="사이드 메뉴 닫기 버튼" />
+            <img src={IMAGES.CLOSE_BTN} alt="사이드 메뉴 닫기 버튼" />
           </p>
         </div>
       )}
 
-      {/* Content 영역 */}
       <div className="content-area">
         <div
           className={
@@ -170,7 +183,7 @@ function Layout() {
           <div className="search-box">
             <input type="text" className="search-bar" />
             <button type="submit" className="search-btn">
-              <img src="images/search-btn.png" />
+              <img src={IMAGES.SEARCH_BTN} alt="검색 버튼" />
             </button>
           </div>
         </div>

@@ -1,18 +1,23 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  user: null,
+  token: null,
+  userInfo: null,
 };
 
 const userSlice = createSlice({
-  name: "user",
+  // 액션 생성자 생성
+  name: "user", //리듀서 이름
   initialState,
   reducers: {
+    // 액션 생성자를 정의하는 객체 '키 :값 ;
     setUser: (state, action) => {
-      state.user = action.payload;
+      state.token = action.payload.token;
+      state.userInfo = action.payload.userInfo;
     },
     logout: (state) => {
-      state.user = null;
+      state.token = null;
+      state.userInfo = null;
     },
   },
 });
