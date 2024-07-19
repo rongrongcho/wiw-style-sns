@@ -291,17 +291,23 @@ app.post("/addPost", upload.array("images", 3), async (req, res) => {
 app.post("/addLikes", async (req, res) => {
   try {
     const { username, postId } = req.body;
+
     if (!username) {
       return res
         .status(401)
         .json({ message: "로그인 후 이용하실 수 있는 서비스입니다." });
     }
-
     const user = await db.collection("user").findOne({ username: username });
+
     if (!user) {
       return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
     }
-
+    const post = await db
+      .collection("post")
+      .findOne({ _id: new ObjectId(postId) });
+    if (!post) {
+      return res.status(404).json({ message: "포스트를 찾을 수 없습니다." });
+    }
     // 유저 객체에 likes 필드가 없으면 초기화
     if (!user.likes) {
       user.likes = [];

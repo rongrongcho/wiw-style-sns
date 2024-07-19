@@ -33,9 +33,18 @@ function ContentLayout({ showSideMenu, IMAGES }) {
         return posts;
     }
   };
-
   // 정렬된 포스트들
   const sortedPosts = sortPosts(posts, sortOrder);
+  // 정렬 버튼 클릭 핸들러
+  const handleSortChange = (order) => {
+    if (sortOrder === order) {
+      // 현재 정렬 기준과 동일하면 디폴트 상태로 리셋
+      setSortOrder("default");
+    } else {
+      // 새로운 정렬 기준으로 변경
+      setSortOrder(order);
+    }
+  };
 
   // 해시태그 검색
   const searchHashtag = async (hashtag) => {
@@ -52,17 +61,6 @@ function ContentLayout({ showSideMenu, IMAGES }) {
       <Card post={post} getHashTag={searchHashtag} />
     </div>
   ));
-
-  // 정렬 버튼 클릭 핸들러
-  const handleSortChange = (order) => {
-    if (sortOrder === order) {
-      // 현재 정렬 기준과 동일하면 디폴트 상태로 리셋
-      setSortOrder("default");
-    } else {
-      // 새로운 정렬 기준으로 변경
-      setSortOrder(order);
-    }
-  };
 
   return (
     <div className="content-area">
