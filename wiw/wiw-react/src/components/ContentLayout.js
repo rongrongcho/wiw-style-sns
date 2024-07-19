@@ -5,7 +5,7 @@ import "../assets/styles/ContentLayout.css";
 
 function ContentLayout({ showSideMenu, IMAGES }) {
   const [posts, setPosts] = useState([]);
-  const [sortOrder, setSortOrder] = useState("default"); // 정렬 상태 추가
+  const [sortOrder, setSortOrder] = useState("default"); // 정렬 상태
 
   useEffect(() => {
     const fetchPosts = async () => {

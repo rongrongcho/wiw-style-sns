@@ -1,14 +1,50 @@
 .detail-modal {
-  position: fixed; /* 고정 위치 */
-  top: 50%; /* 화면 상단에서 50% */
-  left: 50%; /* 화면 왼쪽에서 50% */
-  transform: translate(-50%, -50%); /* 중앙 정렬을 위한 변형 */
-  z-index: 999; /* z-index 설정 */
-  background-color: #fff; /* 배경색 */
-  width: 50%; /* 너비 */
-  height: 70%; /* 높이 */
-  border: 1px solid #ccc; /* 테두리 */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 */
-  padding: 30px; /* 내부 여백 */
-  box-sizing: border-box; /* 박스 크기 계산 */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 999;
+  background-color: #fff;
+  width: 50%;
+  height: 70%;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  box-sizing: border-box;
+  overflow: hidden; /* 이미지가 모달 영역을 넘어가지 않도록 함 */
+}
+
+.slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slider-images img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.prev-btn,
+.next-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.prev-btn {
+  left: 10px;
+}
+
+.next-btn {
+  right: 10px;
 }

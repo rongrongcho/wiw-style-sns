@@ -13,7 +13,7 @@ function Card({ post, getHashTag }) {
     if (loginUserInfo && loginUserInfo.username) {
       setLiked(post.likes.includes(loginUserInfo.username));
     }
-  }, [loginUserInfo, post.likes]);
+  }, [loginUserInfo, post.likes, post]);
 
   const hashtags = post.hashtags.map((hashtag, index) => (
     <span key={index} className="hash-tag" onClick={() => getHashTag(hashtag)}>

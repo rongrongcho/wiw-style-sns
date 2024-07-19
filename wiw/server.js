@@ -10,6 +10,7 @@ const LocalStrategy = require("passport-local").Strategy;
 const cors = require("cors");
 const { check, validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
+const { v4: uuidv4 } = require("uuid"); // UUID 임포트
 
 require("dotenv").config();
 
@@ -25,16 +26,26 @@ const s3 = new S3Client({
     secretAccessKey: process.env.IAM_Secret_Key,
   },
 });
-
 const upload = multer({
   storage: multerS3({
     s3: s3,
-    bucket: process.env.Buket_Name,
-    key: function (요청, file, cb) {
-      cb(null, Date.now().toString()); //업로드시 파일명 변경가능
+    bucket: "wiw-buket",
+    key: function (req, file, cb) {
+      const uniqueName = uuidv4(); // UUID를 사용하여 고유한 파일명 생성
+      const extension = path.extname(file.originalname);
+      cb(null, `${uniqueName}${extension}`);
     },
   }),
 });
+// const upload = multer({
+//   storage: multerS3({
+//     s3: s3,
+//     bucket: process.env.Buket_Name,
+//     key: function (req, file, cb) {
+//       cb(null, Date.now().toString()); //업로드시 파일명 변경가능
+//     },
+//   }),
+// });
 
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "wiw-react/build")));
@@ -261,7 +272,7 @@ app.post("/addPost", upload.array("images", 3), async (req, res) => {
     // 해시태그와 사용자 정보
     if (!req.body.hashtags) {
       return res.status(400).json({ message: "해시태그가 필요합니다." });
-    } else if (!req.body.username) {
+    } else if (!req.body.userinfo) {
       console.log("username이 없아요 ");
     }
 
