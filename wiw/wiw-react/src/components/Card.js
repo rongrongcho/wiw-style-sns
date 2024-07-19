@@ -7,11 +7,13 @@ import Detail from "./Detail";
 function Card({ post, getHashTag }) {
   const [showDetailModal, setDetailModal] = useState(false);
   const loginUserInfo = useSelector((state) => state.user.userInfo);
-  const [liked, setLiked] = useState(
-    loginUserInfo &&
-      loginUserInfo.username &&
-      post.likes.includes(loginUserInfo.username)
-  );
+  const [liked, setLiked] = useState(false);
+
+  useEffect(() => {
+    if (loginUserInfo && loginUserInfo.username) {
+      setLiked(post.likes.includes(loginUserInfo.username));
+    }
+  }, [loginUserInfo, post.likes]);
 
   const hashtags = post.hashtags.map((hashtag, index) => (
     <span key={index} className="hash-tag" onClick={() => getHashTag(hashtag)}>
