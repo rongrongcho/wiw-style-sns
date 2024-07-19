@@ -17,7 +17,7 @@ function Card({ post }) {
     try {
       const response = await axios.post(`/search/${hashtag}`, {});
       console.log(`Search results for ${hashtag}:`, response.data);
-      // 검색 결과를 처리하는 코드 추가
+      // 검색 결과를 처리하는 코드 추가할건데 어칼지 모르겠네 새로운 페이지 깔아부려?
     } catch (error) {
       console.error(`해시태그 검색 실패: ${hashtag}`, error);
     }
