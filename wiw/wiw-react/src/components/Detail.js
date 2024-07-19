@@ -1,16 +1,30 @@
 import React, { useState, useEffect } from "react";
 import "../assets/styles/Detail.css";
 
-function Detail({ post, setDetailModal }) {
+import { useSelector } from "react-redux";
+import axios from "axios";
+
+function Detail({ post, setDetailModal, handleLikes, hashtags }) {
   const [currentImgIdx, setcurrentImgIdx] = useState(0);
+  const loginUserInfo = useSelector((state) => state.user.userInfo);
   const images = post.images || []; // images 기본값 빈 배열 설정
   const [liked, setLiked] = useState(false);
   const likedBtn = "/images/scrap-on-btn.png";
   const unlikedBtn = "/images/scrap-off-btn.png";
   const btnImage = liked ? likedBtn : unlikedBtn;
-  console.log("이미지:" + images);
-  console.log("이미지가있는지 " + images[0]);
-
+  const [postMaster, setPostMaster] = useState(false); // false 로그인한 유저의 게시글 x
+  useEffect(() => {
+    if (loginUserInfo && loginUserInfo.username) {
+      setLiked(post.likes.includes(loginUserInfo.username));
+    }
+    if (
+      loginUserInfo &&
+      loginUserInfo.username &&
+      post.username == loginUserInfo.username
+    ) {
+      setPostMaster(true);
+    }
+  }, [loginUserInfo, post.likes, post]);
   // 이미지 변경 핸들러
   const handlePrevImage = () => {
     setcurrentImgIdx((prevIndex) =>
@@ -60,17 +74,34 @@ function Detail({ post, setDetailModal }) {
           </>
         )}
       </div>
-      <div className="card-content-box">
-        <p className="user-info">{post.username}</p>
-        <p className="scrap-btn">
-          <span className="scrap-cout-text">{post.likes.length}</span>
-          <br />
-          <img src={btnImage} onClick={handleLikes} alt="좋아요 버튼" />
-        </p>
-        <a className="chat-btn">
-          <img src="images/chat-btn.png" alt="채팅 버튼" />
-        </a>
-        <div className="hash-tag-box">{hashtags}</div>
+      <div className="detail-content-box">
+        {postMaster ? (
+          <div>
+            <p className="d-user-info">{post.username}</p>
+            <p className="scrap-btn">
+              <span className="scrap-cout-text">{post.likes.length}</span>
+              <br />
+              <img src={btnImage} onClick={handleLikes} alt="좋아요 버튼" />
+            </p>
+            <span className="edit-post-btn"> edit</span>
+            <span className="delete-post-btn">delete</span>
+            <div className="hash-tag-box">{hashtags}</div>
+          </div>
+        ) : (
+          <div>
+            <p className="d-user-info">{post.username}</p>
+            <p className="scrap-btn">
+              <span className="scrap-cout-text">{post.likes.length}</span>
+              <br />
+              <img src={btnImage} onClick={handleLikes} alt="좋아요 버튼" />
+            </p>
+
+            <a className="chat-btn">
+              <img src="images/chat-btn.png" alt="채팅 버튼" />
+            </a>
+            <div className="hash-tag-box">{hashtags}</div>
+          </div>
+        )}
       </div>
     </div>
   );

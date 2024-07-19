@@ -80,6 +80,7 @@ function Card({ post, getHashTag }) {
           setDetailModal={setDetailModal}
           setLiked={setLiked}
           handleLikes={handleLikes}
+          hashtags={hashtags}
         />
       )}
     </div>

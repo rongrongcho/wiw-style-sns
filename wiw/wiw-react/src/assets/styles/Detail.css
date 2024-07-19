@@ -48,3 +48,11 @@
 .next-btn {
   right: 10px;
 }
+
+/* 컨텐트 박스  */
+
+.egles {
+  background-color: red;
+  width: 100px;
+  height: 40px;
+}
