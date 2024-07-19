@@ -37,9 +37,22 @@
   width: 20%;
   height: 100%;
 }
+/* ===================================== */
 .sort-btns {
   font-size: 16pt;
+  cursor: pointer;
+  padding: 10px;
 }
+
+.sort-btns.active {
+  font-weight: bold;
+  color: #000; /* 원하는 색상으로 변경 */
+}
+
+.sort-btns:not(.active) {
+  color: #888; /* 비활성화 상태 색상 */
+}
+/* ===================================== */
 
 .search-box {
   position: relative;

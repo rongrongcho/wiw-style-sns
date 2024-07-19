@@ -81,6 +81,10 @@ function Write({ setWrite }) {
     const pureTextTags = hashtags.map((tag) => tag.replace(/^#/, ""));
     formData.append("hashtags", JSON.stringify(pureTextTags));
     formData.append("userInfo", JSON.stringify(loginUserInfo.username));
+    // 디버깅을 위한 코드
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
 
     try {
       if (loginUserInfo.username == null) {
@@ -111,6 +115,7 @@ function Write({ setWrite }) {
   return (
     <div>
       <form className="img-upload-form" onSubmit={handleSubmit}>
+        {loginUserInfo.username}
         <input
           type="file"
           accept="image/*"

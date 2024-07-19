@@ -227,39 +227,6 @@ app.post("/logout", (req, res) => {
   });
 });
 
-// 게시글 등록
-app.post("/addPost", upload.array("images", 3), async (req, res) => {
-  try {
-    // 해시태그와 사용자 정보
-    if (!req.body.hashtags || !req.body.userInfo) {
-      return res
-        .status(400)
-        .json({ message: "해시태그와 사용자 정보가 필요합니다." });
-    }
-
-    const hashtags = JSON.parse(req.body.hashtags);
-    const userInfo = JSON.parse(req.body.username);
-
-    // 게시글 객체 생성
-    const post = {
-      username: userInfo.username,
-      images: req.files.map((file) => ({
-        url: file.location, // S3에 업로드된 파일의 URL 등을 저장
-      })),
-      hashtags: hashtags,
-      postedAt: new Date(),
-      likes: [],
-    };
-    // DB에 post 객체 저장
-    await db.collection("post").insertOne(post);
-
-    return res.status(200).json({ message: "게시글 등록 성공", post });
-  } catch (error) {
-    console.error("게시글 등록 실패:", error);
-    return res.status(500).json({ message: "게시글 등록 실패", error });
-  }
-});
-
 // 게시글 목록 조회
 app.get("/api/posts", async (req, res) => {
   try {
@@ -285,6 +252,39 @@ app.get("/search/:hashtag", async (req, res) => {
   } catch (error) {
     console.error("해시태그 검색 실패:", error);
     return res.status(500).json({ message: "해시태그 검색 실패", error });
+  }
+});
+
+// 게시글 등록
+app.post("/addPost", upload.array("images", 3), async (req, res) => {
+  try {
+    // 해시태그와 사용자 정보
+    if (!req.body.hashtags) {
+      return res.status(400).json({ message: "해시태그가 필요합니다." });
+    } else if (!req.body.username) {
+      console.log("username이 없아요 ");
+    }
+
+    const hashtags = JSON.parse(req.body.hashtags);
+    const userInfo = JSON.parse(req.body.userInfo);
+
+    // 게시글 객체 생성
+    const post = {
+      username: userInfo,
+      images: req.files.map((file) => ({
+        url: file.location, // S3에 업로드된 파일의 URL 등을 저장
+      })),
+      hashtags: hashtags,
+      postedAt: new Date(),
+      likes: [],
+    };
+    // DB에 post 객체 저장
+    await db.collection("post").insertOne(post);
+
+    return res.status(200).json({ message: "게시글 등록 성공", post });
+  } catch (error) {
+    console.error("게시글 등록 실패:", error);
+    return res.status(500).json({ message: "게시글 등록 실패", error });
   }
 });
 
