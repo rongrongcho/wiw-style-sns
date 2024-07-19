@@ -50,6 +50,30 @@ function Detail({ post, setDetailModal, handleLikes, hashtags }) {
       />
     );
   }
+  // =====
+  const editPost = () => {
+    // 수정수정수정
+  };
+
+  //게시글 삭제기능 그런데 이제 s3도 곁들인
+
+  const deletePost = async (e) => {
+    e.preventDefault();
+
+    try {
+      // 게시글 삭제 요청 보내기
+      const response = await axios.post("/deletePost", {
+        loginUser: loginUserInfo.username,
+        postWriter: post.username,
+        postId: post._id,
+      });
+      alert("삭제완료!");
+      setDetailModal(false);
+    } catch (error) {
+      console.error("게시글 삭제 실패:", error);
+      alert("게시글 삭제 실패. 나중에 다시 시도해주세요.");
+    }
+  };
 
   return (
     <div className="detail-modal">
@@ -83,8 +107,13 @@ function Detail({ post, setDetailModal, handleLikes, hashtags }) {
               <br />
               <img src={btnImage} onClick={handleLikes} alt="좋아요 버튼" />
             </p>
-            <span className="edit-post-btn"> edit</span>
-            <span className="delete-post-btn">delete</span>
+            <span className="edit-post-btn" onClick={editPost}>
+              {" "}
+              edit
+            </span>
+            <span className="delete-post-btn" onClick={deletePost}>
+              delete
+            </span>
             <div className="hash-tag-box">{hashtags}</div>
           </div>
         ) : (

@@ -13,8 +13,7 @@ const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid"); // UUID 임포트
 
 require("dotenv").config();
-
-const { S3Client } = require("@aws-sdk/client-s3");
+const { S3Client, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const multer = require("multer");
 const multerS3 = require("multer-s3");
 
@@ -26,6 +25,21 @@ const s3 = new S3Client({
     secretAccessKey: process.env.IAM_Secret_Key,
   },
 });
+
+async function deleteS3File(bucket, key) {
+  try {
+    const deleteParams = {
+      Bucket: bucket,
+      Key: key,
+    };
+    const command = new DeleteObjectCommand(deleteParams);
+    await s3.send(command);
+    console.log(`Deleted ${key} from ${bucket}`);
+  } catch (error) {
+    console.error(`Failed to delete ${key} from ${bucket}:`, error);
+  }
+}
+
 const upload = multer({
   storage: multerS3({
     s3: s3,
@@ -37,15 +51,6 @@ const upload = multer({
     },
   }),
 });
-// const upload = multer({
-//   storage: multerS3({
-//     s3: s3,
-//     bucket: process.env.Buket_Name,
-//     key: function (req, file, cb) {
-//       cb(null, Date.now().toString()); //업로드시 파일명 변경가능
-//     },
-//   }),
-// });
 
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "wiw-react/build")));
@@ -269,13 +274,6 @@ app.get("/search/:hashtag", async (req, res) => {
 // 게시글 등록
 app.post("/addPost", upload.array("images", 3), async (req, res) => {
   try {
-    // 해시태그와 사용자 정보
-    if (!req.body.hashtags) {
-      return res.status(400).json({ message: "해시태그가 필요합니다." });
-    } else if (!req.body.userinfo) {
-      console.log("username이 없아요 ");
-    }
-
     const hashtags = JSON.parse(req.body.hashtags);
     const userInfo = JSON.parse(req.body.userInfo);
 
@@ -283,7 +281,7 @@ app.post("/addPost", upload.array("images", 3), async (req, res) => {
     const post = {
       username: userInfo,
       images: req.files.map((file) => ({
-        url: file.location, // S3에 업로드된 파일의 URL 등을 저장
+        url: file.location, // S3에 업로드된 파일의 URL 저장
       })),
       hashtags: hashtags,
       postedAt: new Date(),
@@ -319,7 +317,7 @@ app.post("/addLikes", async (req, res) => {
     if (!post) {
       return res.status(404).json({ message: "포스트를 찾을 수 없습니다." });
     }
-    // 유저 객체에 likes 필드가 없으면 초기화
+    // 유저 객체에 likes 필드가 없으면 만들어줘
     if (!user.likes) {
       user.likes = [];
     }
@@ -359,6 +357,49 @@ app.post("/addLikes", async (req, res) => {
   } catch (error) {
     console.error("좋아요 활동 실패", error);
     return res.status(500).json({ message: "서버 오류 발생", error });
+  }
+});
+// 게시글 삭제
+app.post("/deletePost", async (req, res) => {
+  const { loginUser, postWriter, postId } = req.body;
+
+  try {
+    // 게시글 찾기
+    const post = await db
+      .collection("post")
+      .findOne({ _id: new ObjectId(postId) });
+    if (!post) {
+      return res.status(404).json({ message: "게시글을 찾을 수 없습니다." });
+    }
+
+    // 권한 확인: 로그인 유저가 게시글 작성자와 동일한지 확인
+    if (loginUser !== postWriter) {
+      return res
+        .status(403)
+        .json({ message: "게시글을 삭제할 권한이 없습니다." });
+    }
+
+    // 이미지 파일 삭제
+    const bucket = "wiw-buket"; // S3 버킷 이름
+
+    // 모든 이미지 파일 삭제를 위한 프로미스 배열 생성
+    const deleteAllImg = post.images.map(async (image) => {
+      const key = image.url.split("/").pop(); // 이미지 URL에서 파일명 추출
+      await deleteS3File(bucket, key);
+    });
+
+    // 모든 삭제 작업 실행
+    await Promise.all(deleteAllImg);
+
+    // 게시글 삭제
+    await db.collection("post").deleteOne({ _id: new ObjectId(postId) });
+
+    return res
+      .status(200)
+      .json({ message: "게시글과 이미지를 성공적으로 삭제했습니다." });
+  } catch (error) {
+    console.error("게시글 삭제 실패:", error);
+    return res.status(500).json({ message: "게시글 삭제 실패", error });
   }
 });
 
