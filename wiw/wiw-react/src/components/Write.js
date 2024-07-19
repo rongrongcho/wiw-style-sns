@@ -5,7 +5,7 @@ import axios from "axios";
 
 function Write({ setWrite }) {
   const dispatch = useDispatch();
-  const setUserInfo = useSelector((state) => state.user.user);
+  const loginUserInfo = useSelector((state) => state.user.userInfo);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [content, setContent] = useState("");
   const [hashtags, setHashtags] = useState([]);
@@ -80,9 +80,12 @@ function Write({ setWrite }) {
 
     const pureTextTags = hashtags.map((tag) => tag.replace(/^#/, ""));
     formData.append("hashtags", JSON.stringify(pureTextTags));
-    formData.append("userInfo", JSON.stringify(setUserInfo));
+    formData.append("userInfo", JSON.stringify(loginUserInfo.username));
 
     try {
+      if (loginUserInfo.username == null) {
+        alert("로그인이 풀렸습니다. 다시 로그인해주세요!");
+      }
       const response = await axios.post("/addPost", formData, {
         headers: {
           "Content-Type": "multipart/form-data",

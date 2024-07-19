@@ -229,17 +229,16 @@ app.post("/logout", (req, res) => {
 
 // 게시글 등록
 app.post("/addPost", upload.array("images", 3), async (req, res) => {
-  // 업로드된 이미지 정보는 req.files 배열에 저장됨
-  console.log("업로드된 이미지들:", req.files);
-  if (req.files.length === 0) {
-    return res
-      .status(400)
-      .json({ message: "최소 한 장의 이미지를 업로드해야 합니다." });
-  }
   try {
     // 해시태그와 사용자 정보
+    if (!req.body.hashtags || !req.body.userInfo) {
+      return res
+        .status(400)
+        .json({ message: "해시태그와 사용자 정보가 필요합니다." });
+    }
+
     const hashtags = JSON.parse(req.body.hashtags);
-    const userInfo = JSON.parse(req.body.userInfo);
+    const userInfo = JSON.parse(req.body.username);
 
     // 게시글 객체 생성
     const post = {
@@ -249,7 +248,7 @@ app.post("/addPost", upload.array("images", 3), async (req, res) => {
       })),
       hashtags: hashtags,
       postedAt: new Date(),
-      likes: 0, //좋아요
+      likes: [],
     };
     // DB에 post 객체 저장
     await db.collection("post").insertOne(post);
@@ -280,6 +279,8 @@ app.get("/search/:hashtag", async (req, res) => {
       .collection("post")
       .find({ hashtags: hashtag })
       .toArray();
+    console.log("성공적으로 해시태그를 검색했음");
+    console.log(posts);
     return res.status(200).json(posts);
   } catch (error) {
     console.error("해시태그 검색 실패:", error);
@@ -304,6 +305,10 @@ app.post("/addLikes", async (req, res) => {
     // 유저 객체에 likes 필드가 없으면 초기화
     if (!user.likes) {
       user.likes = [];
+    }
+
+    if (!post.likes) {
+      post.likes = [];
     }
 
     if (user.likes.includes(postId)) {

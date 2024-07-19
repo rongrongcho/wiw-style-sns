@@ -1,11 +1,11 @@
 import Card from "./Card";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useSelector } from "react-redux";
 import "../assets/styles/ContentLayout.css";
 
 function ContentLayout({ showSideMenu, IMAGES }) {
   const [posts, setPosts] = useState([]);
+
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -19,16 +19,26 @@ function ContentLayout({ showSideMenu, IMAGES }) {
     fetchPosts();
   }, []);
 
+  const handleHashtagSearch = async (hashtag) => {
+    try {
+      const response = await axios.get(`/search/${hashtag}`);
+      setPosts(response.data);
+    } catch (error) {
+      console.error(`해시태그 검색 실패: ${hashtag}`, error);
+    }
+  };
+
   const cards = posts.map((post, index) => (
     <div key={index} className="content-item">
-      <Card post={post} />
+      <Card post={post} getHashTag={handleHashtagSearch} />
     </div>
   ));
+
   return (
     <div className="content-area">
       <div
         className={
-          showSideMenu ? " sort-search-area-narrow" : "sort-search-area"
+          showSideMenu ? "sort-search-area-narrow" : "sort-search-area"
         }
       >
         <div className="sort-box">
@@ -42,10 +52,11 @@ function ContentLayout({ showSideMenu, IMAGES }) {
           </button>
         </div>
       </div>
-      <div className={showSideMenu ? " content-box-narrow" : "content-box"}>
+      <div className={showSideMenu ? "content-box-narrow" : "content-box"}>
         {cards}
       </div>
     </div>
   );
 }
+
 export default ContentLayout;

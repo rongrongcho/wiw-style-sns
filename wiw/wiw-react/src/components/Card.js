@@ -4,7 +4,7 @@ import axios from "axios";
 import "../assets/styles/Card.css";
 import Detail from "./Detail";
 
-function Card({ post }) {
+function Card({ post, getHashTag }) {
   const [showDetailModal, setDetailModal] = useState(false);
   const loginUserInfo = useSelector((state) => state.user.userInfo);
   const [liked, setLiked] = useState(
@@ -13,21 +13,8 @@ function Card({ post }) {
       post.likes.includes(loginUserInfo.username)
   );
 
-  const searchHashTag = async (hashtag) => {
-    try {
-      const response = await axios.post(`/search/${hashtag}`, {});
-      console.log(`Search results for ${hashtag}:`, response.data);
-      // 검색 결과를 처리하는 코드 추가할건데 어칼지 모르겠네 새로운 페이지 깔아부려?
-    } catch (error) {
-      console.error(`해시태그 검색 실패: ${hashtag}`, error);
-    }
-  };
   const hashtags = post.hashtags.map((hashtag, index) => (
-    <span
-      key={index}
-      className="hash-tag"
-      onClick={() => searchHashTag(hashtag)}
-    >
+    <span key={index} className="hash-tag" onClick={() => getHashTag(hashtag)}>
       #{hashtag}
     </span>
   ));
@@ -41,14 +28,14 @@ function Card({ post }) {
       if (!loginUserInfo || !loginUserInfo.username) {
         alert("로그인이 필요한 기능입니다.");
         return;
-      } else if (loginUserInfo.username == post.username) {
-        alert("본인 게시글 입니다. 좋아요를 누를 수 없습니다!");
+      } else if (loginUserInfo.username === post.username) {
+        alert("본인 게시글입니다. 좋아요를 누를 수 없습니다!");
+        return;
       } else {
         const response = await axios.post("/addLikes", {
           username: loginUserInfo.username,
           postId: post._id,
         });
-        // 좋아요 상태를 토글
         setLiked(!liked);
         console.log(response.data);
       }
