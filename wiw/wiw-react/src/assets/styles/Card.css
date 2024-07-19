@@ -95,9 +95,9 @@
 
 .hash-tag {
   display: inline-block;
-
   margin-right: 2%;
   margin-bottom: 2%;
+  background-color: pink;
 }
 
 .hash-tag:hover {

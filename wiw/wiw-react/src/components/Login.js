@@ -25,7 +25,7 @@ function Login({ setModal }) {
       const { token, userInfo } = response.data;
       dispatch(setUser({ token, userInfo }));
       sessionStorage.setItem("jwtToken", token);
-      alert("환영합니다 " + userInfo.username + "님"); // userInfo에서 username 가져오기
+      alert("환영합니다 " + userInfo.username + " 님"); // userInfo에서 username 가져오기
       setModal(false);
     } catch (error) {
       // 오류 처리

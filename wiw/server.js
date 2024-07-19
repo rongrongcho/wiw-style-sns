@@ -272,6 +272,21 @@ app.get("/api/posts", async (req, res) => {
   }
 });
 
+// 해시태그 검색
+app.get("/search/:hashtag", async (req, res) => {
+  const hashtag = req.params.hashtag;
+  try {
+    const posts = await db
+      .collection("post")
+      .find({ hashtags: hashtag })
+      .toArray();
+    return res.status(200).json(posts);
+  } catch (error) {
+    console.error("해시태그 검색 실패:", error);
+    return res.status(500).json({ message: "해시태그 검색 실패", error });
+  }
+});
+
 app.post("/addLikes", async (req, res) => {
   try {
     const { username, postId } = req.body;

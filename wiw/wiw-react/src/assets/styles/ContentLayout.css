@@ -1,0 +1,170 @@
+.content-area {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  padding: 2.5% 3.65%;
+  box-sizing: border-box;
+}
+
+.sort-search-area {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  height: 5%;
+  margin-bottom: 2.5%;
+}
+
+.sort-search-area-narrow {
+  position: relative;
+  left: 12%;
+  height: 5%;
+  margin-bottom: 2.5%;
+  width: 83%;
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: 0 3%;
+}
+
+.sort-box {
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: 0.8% 3.5%;
+  position: relative;
+  width: 20%;
+  height: 100%;
+}
+.sort-btns {
+  font-size: 16pt;
+}
+
+.search-box {
+  position: relative;
+  box-sizing: border-box;
+  width: 30%;
+
+  height: 100%;
+}
+
+.search-bar {
+  position: relative;
+  right: -18%;
+  top: -9%;
+  width: 20%;
+  height: 100%;
+  box-sizing: border-box;
+  background-color: #fff;
+  padding: 1%;
+  border: 1px solid black;
+  border-radius: 30px;
+  text-align: center;
+  transition: width 0.5s ease-in-out;
+}
+
+.search-bar:hover {
+  width: 70%;
+}
+.search-btn {
+  position: relative;
+  right: -10%;
+  width: 8%;
+  height: 90%;
+  border: 1px solid black;
+  background-color: #fff;
+  border-radius: 100%;
+}
+
+.content-box {
+  display: flex;
+  flex-wrap: wrap;
+  height: 100%;
+  gap: 20px;
+  overflow-y: scroll;
+  justify-content: center; /* 가운데 정렬 */
+}
+
+.content-item {
+  flex: 0 1 calc(25% - 20px); /* 가로 간격을 고려하여 설정 */
+  height: 550px;
+  background-color: #f0f0f0;
+  border-radius: 15px;
+  margin-bottom: 20px; /* 아래 여백 추가 */
+}
+
+.content-box-narrow {
+  position: relative;
+  display: flex;
+  width: 84%;
+  flex-wrap: wrap;
+  height: 100%;
+  overflow-y: scroll;
+  gap: 20px;
+  justify-content: center; /* 가운데 정렬 */
+}
+
+.content-box-narrow > .content-item {
+  flex: 0 1 calc(30% - 20px);
+  height: 550px;
+  background-color: #f0f0f0;
+  border-radius: 15px;
+  margin-bottom: 30px; /* 아래 여백 추가 */
+}
+
+.content-item:last-child {
+  margin-bottom: 15%;
+}
+
+@media (min-width: 1700px) and (max-width: 1920px) {
+  .content-box-narrow {
+    left: 12%; /* 1200px 이하에서 가운데 정렬을 위한 왼쪽 마진 조정 */
+  }
+  .content-item {
+    flex: 0 1 calc(25% - 20px); /* 너비 조정 */
+  }
+
+  .content-box-narrow > .content-item {
+    flex: 0 1 calc(33% - 20px);
+  }
+}
+
+@media (min-width: 1400px) and (max-width: 1600px) {
+  .content-box-narrow {
+    left: 15%; /* 1200px 이하에서 가운데 정렬을 위한 왼쪽 마진 조정 */
+  }
+  .content-item {
+    flex: 0 1 calc(25% - 20px); /* 너비 조정 */
+  }
+  .content-box-narrow > .content-item {
+    flex: 0 1 calc(33% - 20px);
+  }
+
+  .sort-search-area-narrow {
+    width: 80%;
+    left: 16%;
+  }
+
+  .sort-btns {
+    font-size: 14pt;
+  }
+}
+
+@media (max-width: 768px) {
+  .content-box-narrow {
+    margin-left: 6%; /* 768px 이하에서 가운데 정렬을 위한 왼쪽 마진 조정 */
+  }
+  .content-item {
+    flex: 0 1 calc(45% - 20px); /* 너비 조정 */
+  }
+}
+
+@media (max-width: 480px) {
+  .content-box-narrow {
+    margin-left: 0; /* 480px 이하에서 가운데 정렬을 위한 왼쪽 마진 조정 해제 */
+  }
+  .content-item {
+    flex: 0 1 calc(100% - 20px); /* 너비 조정 */
+  }
+}

@@ -6,6 +6,7 @@ import Login from "./Login";
 import SignUp from "./SignUp";
 import Card from "./Card";
 import Logout from "./Logout";
+import ContentLayout from "./ContentLayout";
 import Write from "./Write";
 
 // 이미지 및 버튼 텍스트 경로 상수화
@@ -18,26 +19,11 @@ const IMAGES = {
 };
 
 function Layout() {
-  const [posts, setPosts] = useState([]);
   const [showModal, setModal] = useState(null);
   const [showSideMenu, setSideMenu] = useState(false);
   const loginUserInfo = useSelector((state) => state.user.userInfo);
   const [showMember, setMember] = useState(false);
   const [showWrite, setWrite] = useState(false);
-
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await axios.get("/api/posts");
-        setPosts(response.data);
-      } catch (error) {
-        console.error("게시글 가져오기 실패:", error);
-      }
-    };
-
-    fetchPosts();
-  }, []);
-
   function openSideMenu() {
     setSideMenu(true);
   }
@@ -45,12 +31,6 @@ function Layout() {
   function closeSideMenu() {
     setSideMenu(false);
   }
-
-  const cards = posts.map((post, index) => (
-    <div key={index} className="content-item">
-      <Card post={post} />
-    </div>
-  ));
 
   return (
     <div className="container">
@@ -169,28 +149,7 @@ function Layout() {
           </p>
         </div>
       )}
-
-      <div className="content-area">
-        <div
-          className={
-            showSideMenu ? " sort-search-area-narrow" : "sort-search-area"
-          }
-        >
-          <div className="sort-box">
-            <p className="sort-btns sort-scrap">스크랩</p>
-            <p className="sort-btns sort-day">날짜순</p>
-          </div>
-          <div className="search-box">
-            <input type="text" className="search-bar" />
-            <button type="submit" className="search-btn">
-              <img src={IMAGES.SEARCH_BTN} alt="검색 버튼" />
-            </button>
-          </div>
-        </div>
-        <div className={showSideMenu ? " content-box-narrow" : "content-box"}>
-          {cards}
-        </div>
-      </div>
+      <ContentLayout showSideMenu={showSideMenu} IMAGES={IMAGES} />
     </div>
   );
 }

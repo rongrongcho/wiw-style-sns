@@ -13,6 +13,25 @@ function Card({ post }) {
       post.likes.includes(loginUserInfo.username)
   );
 
+  const searchHashTag = async (hashtag) => {
+    try {
+      const response = await axios.post(`/search/${hashtag}`, {});
+      console.log(`Search results for ${hashtag}:`, response.data);
+      // 검색 결과를 처리하는 코드 추가
+    } catch (error) {
+      console.error(`해시태그 검색 실패: ${hashtag}`, error);
+    }
+  };
+  const hashtags = post.hashtags.map((hashtag, index) => (
+    <span
+      key={index}
+      className="hash-tag"
+      onClick={() => searchHashTag(hashtag)}
+    >
+      #{hashtag}
+    </span>
+  ));
+
   const likedBtn = "/images/scrap-on-btn.png";
   const unlikedBtn = "/images/scrap-off-btn.png";
   const btnImage = liked ? likedBtn : unlikedBtn;
@@ -64,12 +83,7 @@ function Card({ post }) {
         <a className="chat-btn">
           <img src="images/chat-btn.png" alt="채팅 버튼" />
         </a>
-        <div className="hash-tag-box">
-          <a className="hash-tag" href="">
-            {" "}
-            #ootd
-          </a>
-        </div>
+        <div className="hash-tag-box">{hashtags}</div>
       </div>
       {showDetailModal && (
         <Detail
