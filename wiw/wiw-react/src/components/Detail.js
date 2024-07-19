@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../assets/styles/Detail.css";
-
+import EditPost from "./EditPost";
 import { useSelector } from "react-redux";
 import axios from "axios";
 
@@ -12,6 +12,7 @@ function Detail({ post, setDetailModal, handleLikes, hashtags }) {
   const likedBtn = "/images/scrap-on-btn.png";
   const unlikedBtn = "/images/scrap-off-btn.png";
   const btnImage = liked ? likedBtn : unlikedBtn;
+  const [editModal, setEditModal] = useState(false);
   const [postMaster, setPostMaster] = useState(false); // false 로그인한 유저의 게시글 x
   useEffect(() => {
     if (loginUserInfo && loginUserInfo.username) {
@@ -51,8 +52,14 @@ function Detail({ post, setDetailModal, handleLikes, hashtags }) {
     );
   }
   // =====
-  const editPost = () => {
-    // 수정수정수정
+
+  //게시글 수정기능 그런데 이제...음
+  const editPost = (e) => {
+    e.preventDefault();
+    try {
+      setEditModal(true);
+      // setDetailModal(false);
+    } catch (error) {}
   };
 
   //게시글 삭제기능 그런데 이제 s3도 곁들인
@@ -75,7 +82,11 @@ function Detail({ post, setDetailModal, handleLikes, hashtags }) {
     }
   };
 
-  return (
+  return editModal ? (
+    <div>
+      <EditPost setEditModal={setEditModal} post={post} />
+    </div>
+  ) : (
     <div className="detail-modal">
       <p
         className="close-btn"
@@ -108,7 +119,6 @@ function Detail({ post, setDetailModal, handleLikes, hashtags }) {
               <img src={btnImage} onClick={handleLikes} alt="좋아요 버튼" />
             </p>
             <span className="edit-post-btn" onClick={editPost}>
-              {" "}
               edit
             </span>
             <span className="delete-post-btn" onClick={deletePost}>

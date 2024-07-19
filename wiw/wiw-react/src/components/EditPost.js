@@ -1,23 +1,29 @@
-import React, { useState } from "react";
-import { setUser } from "../store/slices/userSlice";
-import { useSelector, useDispatch } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import "../assets/styles/Detail.css";
+import "../assets/styles/WriteEdit.css";
 import axios from "axios";
 
-function Write({ setWrite }) {
+function EditPost({ setEditModal, post }) {
   const loginUserInfo = useSelector((state) => state.user.userInfo);
   const [selectedFiles, setSelectedFiles] = useState([]);
-  const [content, setContent] = useState("");
   const [hashtags, setHashtags] = useState([]);
   const [newTag, setNewTag] = useState("");
-  // const [postData, setPostData] = useState(null);
+  const [postData, setPostData] = useState(null);
+
+  useEffect(() => {
+    if (post) {
+      setHashtags(post.hashtags || []);
+      // post.images의 URL을 selectedFiles 상태로 초기화
+      setSelectedFiles(post.images.map((image) => image.url));
+    }
+  }, [post]);
 
   const handleFileChange = (e) => {
     if (e.target.files.length + selectedFiles.length > 3) {
       alert("최대 3장까지 업로드 가능합니다.");
-      setSelectedFiles([]);
       return;
     }
-
     const imgFileArr = Array.from(e.target.files);
     setSelectedFiles((prevFiles) => [...prevFiles, ...imgFileArr]);
   };
@@ -26,17 +32,6 @@ function Write({ setWrite }) {
     setSelectedFiles((prevFiles) =>
       prevFiles.filter((_, fileIndex) => fileIndex !== index)
     );
-  };
-
-  const handleAddTag = () => {
-    const trimmedTag = newTag.trim();
-    if (trimmedTag === "") return;
-    if (hashtags.length >= 5) {
-      alert("해시태그는 최대 5개까지 추가할 수 있습니다.");
-      return;
-    }
-    setHashtags((prevTags) => [...prevTags, `#${trimmedTag}`]);
-    setNewTag("");
   };
 
   const handleRemoveTag = (index) => {
@@ -52,11 +47,26 @@ function Write({ setWrite }) {
     }
     for (const tag of hashtags) {
       if (tag.length > 12) {
-        alert("각 해시태그는 최대 10자까지 가능합니다.");
+        alert("각 해시태그는 최대 12자까지 가능합니다.");
         return false;
       }
     }
     return true;
+  };
+
+  const handleTagChange = (e) => {
+    setNewTag(e.target.value);
+  };
+
+  const handleAddTag = () => {
+    const trimmedTag = newTag.trim();
+    if (trimmedTag === "") return;
+    if (hashtags.length >= 5) {
+      alert("해시태그는 최대 5개까지 추가할 수 있습니다.");
+      return;
+    }
+    setHashtags((prevTags) => [...prevTags, `#${trimmedTag}`]);
+    setNewTag("");
   };
 
   const handleSubmit = async (e) => {
@@ -73,58 +83,57 @@ function Write({ setWrite }) {
 
     const formData = new FormData();
     selectedFiles.forEach((file) => {
-      formData.append("images", file);
+      if (typeof file === "string") {
+        formData.append("existingImages", file);
+      } else {
+        formData.append("images", file);
+      }
     });
 
     const pureTextTags = hashtags.map((tag) => tag.replace(/^#/, ""));
     formData.append("hashtags", JSON.stringify(pureTextTags));
     formData.append("userInfo", JSON.stringify(loginUserInfo.username));
-    // 디버깅을 위한 코드
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
+    formData.append("postId", post._id);
 
     try {
-      if (loginUserInfo.username == null) {
-        alert("로그인이 풀렸습니다. 다시 로그인해주세요!");
-      }
-      const response = await axios.post("/addPost", formData, {
+      const response = await axios.post("/editPost", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
-      // setPostData(response.data.post);
-      alert("업로드 성공!");
-      setWrite(false);
-      setSelectedFiles([]);
-      setContent("");
-      setHashtags([]);
-      setNewTag("");
+      setPostData(response.data.post);
+      alert("수정하기 성공!");
+      setEditModal(false);
     } catch (error) {
       console.error("포스팅 실패", error.response.data);
     }
   };
 
-  const handleTagChange = (e) => {
-    setNewTag(e.target.value);
-  };
-
   return (
-    <div>
+    <div className="red">
+      <p
+        className="close-btn"
+        onClick={() => {
+          setEditModal(false);
+        }}
+      >
+        <img src="/images/close-btn.png" alt="모달창 닫기 버튼" />
+      </p>
       <form className="img-upload-form" onSubmit={handleSubmit}>
         <input
           type="file"
           accept="image/*"
           multiple
           onChange={handleFileChange}
-          required
         />
         <div className="preview-box">
           {selectedFiles.map((file, index) => (
             <div key={index} className="image-preview">
               <img
-                src={URL.createObjectURL(file)}
+                src={
+                  typeof file === "string" ? file : URL.createObjectURL(file)
+                }
                 alt={`미리보기 ${index}`}
                 className="preview-img"
               />
@@ -171,4 +180,4 @@ function Write({ setWrite }) {
   );
 }
 
-export default Write;
+export default EditPost;

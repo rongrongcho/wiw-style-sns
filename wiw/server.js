@@ -11,7 +11,6 @@ const cors = require("cors");
 const { check, validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid"); // UUID 임포트
-
 require("dotenv").config();
 const { S3Client, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const multer = require("multer");
@@ -227,7 +226,6 @@ app.post("/verifyToken", (req, res) => {
 });
 
 // 로그아웃
-// 예시: Express 서버에서의 로그아웃 처리
 app.post("/logout", (req, res) => {
   req.logout(function (err) {
     if (err) {
@@ -359,6 +357,69 @@ app.post("/addLikes", async (req, res) => {
     return res.status(500).json({ message: "서버 오류 발생", error });
   }
 });
+app.post("/editPost", upload.array("images", 3), async (req, res) => {
+  const { postId, userInfo, hashtags, existingImages } = req.body;
+  const files = req.files;
+
+  try {
+    // 기존 저장 데이터 가져오기 (수정 전)
+    const oldData = await db
+      .collection("post")
+      .findOne({ _id: new ObjectId(postId) });
+    if (!oldData) {
+      return res.status(404).json({ error: "포스트를 찾을 수 없습니다." });
+    }
+
+    // 수정하려고 하는 데이터
+    const newImageUrls = files.map(
+      (file) => file.location // multerS3에서 제공하는 URL
+    );
+
+    //  기존 이미지 URL
+    const oldImageUrls = oldData.images.map((img) => img.url);
+
+    //  삭제할 이미지 찾기
+    // 기존 이미지 URL 중에서 업로드된 이미지와 일치하지 않는 이미지를 찾습니다.
+    const imagesToRemove = oldImageUrls.filter(
+      (url) => !newImageUrls.includes(url) && !existingImages.includes(url)
+    );
+
+    console.log("Images to Remove:", imagesToRemove);
+
+    // S3에서 이미지 삭제
+    const deleteAllImg = imagesToRemove.map((url) => {
+      const key = url.split("/").pop(); // 파일 이름만 추출
+      return deleteS3File("wiw-buket", key); // 버킷 이름 확인 (오타제발 왜 env안되는지..)
+    });
+
+    await Promise.all(deleteAllImg);
+
+    //  업데이트할 이미지 경로들
+    const updatedImages = oldData.images
+      .filter((img) => !imagesToRemove.includes(img.url))
+      .concat(newImageUrls.map((url) => ({ url })));
+
+    // 업데이트할 해시태그
+    const updatedHashtags = JSON.parse(hashtags);
+
+    // 디비 업로드
+    await db.collection("post").updateOne(
+      { _id: new ObjectId(postId) },
+      {
+        $set: {
+          images: updatedImages,
+          hashtags: updatedHashtags,
+        },
+      }
+    );
+
+    res.status(200).json({ message: "포스트 수정 성공" });
+  } catch (error) {
+    console.error("포스팅 수정 실패", error);
+    res.status(500).json({ error: "포스팅 수정 실패" });
+  }
+});
+
 // 게시글 삭제
 app.post("/deletePost", async (req, res) => {
   const { loginUser, postWriter, postId } = req.body;
@@ -382,13 +443,13 @@ app.post("/deletePost", async (req, res) => {
     // 이미지 파일 삭제
     const bucket = "wiw-buket"; // S3 버킷 이름
 
-    // 모든 이미지 파일 삭제를 위한 프로미스 배열 생성
+    //  이미지 파일 삭제를 위한 배열 생성
     const deleteAllImg = post.images.map(async (image) => {
       const key = image.url.split("/").pop(); // 이미지 URL에서 파일명 추출
       await deleteS3File(bucket, key);
     });
 
-    // 모든 삭제 작업 실행
+    // 삭제 작업 실행
     await Promise.all(deleteAllImg);
 
     // 게시글 삭제
