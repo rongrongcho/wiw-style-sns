@@ -15,6 +15,29 @@ require("dotenv").config();
 const { S3Client, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const multer = require("multer");
 const multerS3 = require("multer-s3");
+//웹 소켓
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000", // 클라이언트 주소
+    methods: ["GET", "POST"],
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("새로운 클라이언트 연결");
+
+  socket.on("sendMessage", (message) => {
+    io.emit("receiveMessage", message);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("클라이언트 연결 해제");
+  });
+});
+// ====================================================
 
 const s3 = new S3Client({
   region: "ap-northeast-2",
@@ -76,6 +99,7 @@ app.use(passport.session());
 let connectDB = require("./database.js");
 const { ObjectId } = require("mongodb");
 const { error } = require("console");
+const { randomInt } = require("crypto");
 let db;
 
 connectDB
@@ -122,7 +146,7 @@ passport.use(
 );
 
 //========================================================
-app.listen(process.env.PORT, () => {
+server.listen(process.env.PORT, () => {
   console.log(`http://localhost:${process.env.PORT} 에서 서버 실행 중`);
 });
 
@@ -461,6 +485,66 @@ app.post("/deletePost", async (req, res) => {
   } catch (error) {
     console.error("게시글 삭제 실패:", error);
     return res.status(500).json({ message: "게시글 삭제 실패", error });
+  }
+});
+
+//=================================================================
+//실시간 채팅 기능 만들기 (db저장도)
+
+// Socket.IO 연결 및 이벤트 처리
+io.on("connection", (socket) => {
+  console.log("새로운 클라이언트 연결");
+
+  socket.on("ask-join", (data) => {
+    socket.join(data);
+    console.log("룸 가입 완료");
+  });
+
+  socket.on("disconnect", () => {
+    console.log("클라이언트 연결 해제");
+  });
+});
+
+app.post("/chatroom", async (req, res) => {
+  const { loginUsername, postUsername } = req.body;
+  console.log("채팅방 입장 멤버 확인 : " + loginUsername + "/" + postUsername);
+
+  try {
+    // DB에서 채팅방 존재 여부 확인
+    const isExistRoom = await db.collection("chatroom").findOne({
+      member: { $all: [loginUsername, postUsername] },
+    });
+
+    if (isExistRoom) {
+      // 채팅방이 이미 존재하는 경우
+      res.status(200).json({
+        message: "채팅방이 이미 존재합니다",
+        chatroom: isExistRoom,
+      });
+    } else {
+      const roomName = uuidv4(); //  roomName으로 사용
+      // 새로운 채팅방 생성
+      await db.collection("chatroom").insertOne({
+        member: [loginUsername, postUsername],
+        createAt: new Date(),
+        roomName: roomName,
+      });
+
+      const chatroom = await db.collection("chatroom").findOne({
+        member: { $all: [loginUsername, postUsername] },
+      });
+
+      res.status(201).json({
+        message: "채팅방 만들기 완료",
+        chatroom: chatroom,
+      });
+    }
+  } catch (error) {
+    console.error("채팅방 생성 실패:", error);
+    res.status(500).json({
+      message: "서버 오류로 채팅방 생성 실패",
+      error: error.message,
+    });
   }
 });
 

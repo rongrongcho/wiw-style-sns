@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import "../assets/styles/Layout.css";
 import Login from "./Login";
 import SignUp from "./SignUp";
-import Card from "./Card";
 import Logout from "./Logout";
-import ContentLayout from "./ContentLayout";
 import Write from "./Write";
+import ContentLayout from "./ContentLayout";
+import ChatLayout from "./ChatLayout";
 
 // 이미지 및 버튼 텍스트 경로 상수화
 const IMAGES = {
@@ -24,6 +25,9 @@ function Layout() {
   const loginUserInfo = useSelector((state) => state.user.userInfo);
   const [showMember, setMember] = useState(false);
   const [showWrite, setWrite] = useState(false);
+  const location = useLocation();
+  const urlPath = location.pathname; // 현재 path 경로만 저장
+
   function openSideMenu() {
     setSideMenu(true);
   }
@@ -138,7 +142,7 @@ function Layout() {
               </ul>
             </li>
             <li className="main-menu-btns">
-              <a href="#">Chat</a>
+              <a href="/chat">Chat</a>
             </li>
             <li className="main-menu-btns">
               <a href="#">...</a>
@@ -149,7 +153,12 @@ function Layout() {
           </p>
         </div>
       )}
-      <ContentLayout showSideMenu={showSideMenu} IMAGES={IMAGES} />
+
+      {urlPath === "/chat" ? (
+        <ChatLayout />
+      ) : (
+        <ContentLayout showSideMenu={showSideMenu} IMAGES={IMAGES} />
+      )}
     </div>
   );
 }

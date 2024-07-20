@@ -3,11 +3,21 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import "../assets/styles/Card.css";
 import Detail from "./Detail";
+import ChatModal from "./ChatModal";
+import io from "socket.io-client";
+const socket = io("http://localhost:8080");
 
 function Card({ post, getHashTag }) {
   const [showDetailModal, setDetailModal] = useState(false);
   const loginUserInfo = useSelector((state) => state.user.userInfo);
+  const postUsername = post.username;
   const [liked, setLiked] = useState(false);
+  const likedBtn = "/images/scrap-on-btn.png";
+  const unlikedBtn = "/images/scrap-off-btn.png";
+  const btnImage = liked ? likedBtn : unlikedBtn;
+  // 채팅 기능을 위한 상태 변수
+  const [chatRoom, setChatRoom] = useState(null);
+  const [showChatModal, setShowChatMdoal] = useState(false);
 
   useEffect(() => {
     if (loginUserInfo && loginUserInfo.username) {
@@ -21,9 +31,27 @@ function Card({ post, getHashTag }) {
     </span>
   ));
 
-  const likedBtn = "/images/scrap-on-btn.png";
-  const unlikedBtn = "/images/scrap-off-btn.png";
-  const btnImage = liked ? likedBtn : unlikedBtn;
+  const hadleChatRoom = async () => {
+    try {
+      if (!loginUserInfo || !loginUserInfo.username) {
+        alert("로그인이 필요한 기능입니다.");
+        return;
+      } else if (loginUserInfo.username === postUsername) {
+        alert("본인에게 메시지를 전송할 수 없습니다.");
+        return;
+      }
+      const response = await axios.post("/chatroom", {
+        loginUsername: loginUserInfo.username,
+        postUsername: postUsername,
+      });
+      console.log("채팅방 생성 성공", response.data.chatroom.roomName);
+      setChatRoom(response.data.chatroom);
+      socket.emit("ask-join", response.data.chatroom.roomName);
+      setShowChatMdoal(true);
+    } catch (error) {
+      console.error("채팅방 입장 실패: ", error);
+    }
+  };
 
   const handleLikes = async () => {
     try {
@@ -69,9 +97,9 @@ function Card({ post, getHashTag }) {
           <br />
           <img src={btnImage} onClick={handleLikes} alt="좋아요 버튼" />
         </p>
-        <a className="chat-btn">
+        <p className="chat-btn" onClick={hadleChatRoom}>
           <img src="images/chat-btn.png" alt="채팅 버튼" />
-        </a>
+        </p>
         <div className="hash-tag-box">{hashtags}</div>
       </div>
       {showDetailModal && (
@@ -81,7 +109,12 @@ function Card({ post, getHashTag }) {
           setLiked={setLiked}
           handleLikes={handleLikes}
           hashtags={hashtags}
+          chatRoom={chatRoom}
+          setShowChatMdoal={setShowChatMdoal}
         />
+      )}
+      {showChatModal && (
+        <ChatModal chatRoom={chatRoom} setShowChatModal={setShowChatMdoal} />
       )}
     </div>
   );

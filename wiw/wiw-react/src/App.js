@@ -34,6 +34,7 @@ function App() {
     <div className="App">
       <Routes>
         <Route path="/" element={<Layout />} />
+        <Route path="/chat" element={<Layout />} />
       </Routes>
     </div>
   );

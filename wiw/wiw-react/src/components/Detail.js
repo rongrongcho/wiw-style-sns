@@ -4,7 +4,14 @@ import EditPost from "./EditPost";
 import { useSelector } from "react-redux";
 import axios from "axios";
 
-function Detail({ post, setDetailModal, handleLikes, hashtags }) {
+function Detail({
+  post,
+  setDetailModal,
+  handleLikes,
+  hashtags,
+  chatRoom,
+  setShowChatRoom,
+}) {
   const [currentImgIdx, setcurrentImgIdx] = useState(0);
   const loginUserInfo = useSelector((state) => state.user.userInfo);
   const images = post.images || []; // images 기본값 빈 배열 설정
