@@ -98,7 +98,7 @@ app.use(passport.session());
 
 let connectDB = require("./database.js");
 const { ObjectId } = require("mongodb");
-const { error } = require("console");
+const { error, timeStamp } = require("console");
 const { randomInt } = require("crypto");
 let db;
 
@@ -403,7 +403,6 @@ app.post("/editPost", upload.array("images", 3), async (req, res) => {
     const oldImageUrls = oldData.images.map((img) => img.url);
 
     //  삭제할 이미지 찾기
-    // 기존 이미지 URL 중에서 업로드된 이미지와 일치하지 않는 이미지를 찾습니다.
     const imagesToRemove = oldImageUrls.filter(
       (url) => !newImageUrls.includes(url) && !existingImages.includes(url)
     );
@@ -499,6 +498,36 @@ io.on("connection", (socket) => {
     socket.join(data);
     console.log("룸 가입 완료");
   });
+  //클라이언트가 보낸 메세지 수신하고 데이터 저장하고 다시 리턴해주기
+  socket.on("chat-msg", async (data) => {
+    try {
+      socket.join(data.roomName);
+
+      //디비 저장하기
+      const result = await db.collection("chat-msg").insertOne({
+        parent_id: new ObjectId(data.parent_id),
+        msg: data.msg,
+        sender: data.sender,
+        receiver: data.receiver,
+        date: new Date(),
+      });
+      console.log("메세지 디비 저장 성공");
+      // 새로운 메세지 전송하기
+      io.to(data.roomName).emit("new-message", {
+        msg: data.msg,
+        sender: data.sender,
+        date: new Date(),
+      });
+    } catch (error) {
+      console.error("메세지 전송 오류:", error);
+    }
+  });
+
+  //방떠나기
+  socket.on("leave-room", (roomName) => {
+    socket.leave(roomName);
+    console.log(`User left room: ${roomName}`);
+  });
 
   socket.on("disconnect", () => {
     console.log("클라이언트 연결 해제");
@@ -545,6 +574,20 @@ app.post("/chatroom", async (req, res) => {
       message: "서버 오류로 채팅방 생성 실패",
       error: error.message,
     });
+  }
+});
+
+// 채팅 이력 가져오기
+app.get("/chat-history/:roomId", async (req, res) => {
+  try {
+    const roomId = req.params.roomId;
+    const messages = await db
+      .collection("chat-msg")
+      .find({ parent_id: new ObjectId(roomId) })
+      .toArray();
+    res.json(messages);
+  } catch (error) {
+    res.status(500).send("서버 오류");
   }
 });
 
