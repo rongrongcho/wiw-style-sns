@@ -35,7 +35,7 @@ function ChatModal({ setShowChatModal, chatRoom }) {
       socket.off("new-message");
       socket.emit("leave-room", chatRoom.roomName);
     };
-  }, [chatRoom._id]);
+  }, [chatHistory]);
 
   const handleSendMsg = async () => {
     try {

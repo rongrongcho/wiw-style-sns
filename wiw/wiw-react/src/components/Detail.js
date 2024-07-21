@@ -1,26 +1,26 @@
 import React, { useState, useEffect } from "react";
 import "../assets/styles/Detail.css";
 import EditPost from "./EditPost";
+import ChatModal from "./ChatModal";
 import { useSelector } from "react-redux";
 import axios from "axios";
+import io from "socket.io-client";
+const socket = io("http://localhost:8080");
 
-function Detail({
-  post,
-  setDetailModal,
-  handleLikes,
-  hashtags,
-  chatRoom,
-  setShowChatRoom,
-}) {
+function Detail({ post, setDetailModal, handleLikes, hashtags }) {
   const [currentImgIdx, setcurrentImgIdx] = useState(0);
   const loginUserInfo = useSelector((state) => state.user.userInfo);
   const images = post.images || []; // images 기본값 빈 배열 설정
+  const postUsername = post.username;
   const [liked, setLiked] = useState(false);
   const likedBtn = "/images/scrap-on-btn.png";
   const unlikedBtn = "/images/scrap-off-btn.png";
   const btnImage = liked ? likedBtn : unlikedBtn;
   const [editModal, setEditModal] = useState(false);
   const [postMaster, setPostMaster] = useState(false); // false 로그인한 유저의 게시글 x
+  // 채팅 기능 구현
+  const [chatRoom, setChatRoom] = useState(null);
+  const [showChatModal, setShowChatModal] = useState(false); // 여기 수정
   useEffect(() => {
     if (loginUserInfo && loginUserInfo.username) {
       setLiked(post.likes.includes(loginUserInfo.username));
@@ -33,6 +33,29 @@ function Detail({
       setPostMaster(true);
     }
   }, [loginUserInfo, post.likes, post]);
+
+  //채팅 함수
+  const handleChatRoom = async () => {
+    try {
+      if (!loginUserInfo || !loginUserInfo.username) {
+        alert("로그인이 필요한 기능입니다.");
+        return;
+      } else if (loginUserInfo.username === postUsername) {
+        alert("본인에게 메시지를 전송할 수 없습니다.");
+        return;
+      }
+      const response = await axios.post("/chatroom", {
+        loginUsername: loginUserInfo.username,
+        postUsername: postUsername,
+      });
+      console.log("채팅방 생성 성공", response.data.chatroom.roomName);
+      setChatRoom(response.data.chatroom);
+      socket.emit("ask-join", response.data.chatroom.roomName);
+      setShowChatModal(true);
+    } catch (error) {
+      console.error("채팅방 입장 실패: ", error);
+    }
+  };
   // 이미지 변경 핸들러
   const handlePrevImage = () => {
     setcurrentImgIdx((prevIndex) =>
@@ -116,6 +139,14 @@ function Detail({
           </>
         )}
       </div>
+      {showChatModal && (
+        <ChatModal
+          chatRoom={chatRoom}
+          setShowChatModal={setShowChatModal}
+          showChatModal={showChatModal}
+          handleChatRoom={handleChatRoom}
+        />
+      )}
       <div className="detail-content-box">
         {postMaster ? (
           <div>
@@ -142,9 +173,9 @@ function Detail({
               <img src={btnImage} onClick={handleLikes} alt="좋아요 버튼" />
             </p>
 
-            <a className="chat-btn">
+            <p className="chat-btn" onClick={handleChatRoom}>
               <img src="images/chat-btn.png" alt="채팅 버튼" />
-            </a>
+            </p>
             <div className="hash-tag-box">{hashtags}</div>
           </div>
         )}

@@ -17,7 +17,7 @@ function Card({ post, getHashTag }) {
   const btnImage = liked ? likedBtn : unlikedBtn;
   // 채팅 기능을 위한 상태 변수
   const [chatRoom, setChatRoom] = useState(null);
-  const [showChatModal, setShowChatMdoal] = useState(false);
+  const [showChatModal, setShowChatModal] = useState(false); // 여기 수정
 
   useEffect(() => {
     if (loginUserInfo && loginUserInfo.username) {
@@ -31,7 +31,7 @@ function Card({ post, getHashTag }) {
     </span>
   ));
 
-  const hadleChatRoom = async () => {
+  const handleChatRoom = async () => {
     try {
       if (!loginUserInfo || !loginUserInfo.username) {
         alert("로그인이 필요한 기능입니다.");
@@ -47,7 +47,7 @@ function Card({ post, getHashTag }) {
       console.log("채팅방 생성 성공", response.data.chatroom.roomName);
       setChatRoom(response.data.chatroom);
       socket.emit("ask-join", response.data.chatroom.roomName);
-      setShowChatMdoal(true);
+      setShowChatModal(true);
     } catch (error) {
       console.error("채팅방 입장 실패: ", error);
     }
@@ -97,7 +97,7 @@ function Card({ post, getHashTag }) {
           <br />
           <img src={btnImage} onClick={handleLikes} alt="좋아요 버튼" />
         </p>
-        <p className="chat-btn" onClick={hadleChatRoom}>
+        <p className="chat-btn" onClick={handleChatRoom}>
           <img src="images/chat-btn.png" alt="채팅 버튼" />
         </p>
         <div className="hash-tag-box">{hashtags}</div>
@@ -110,11 +110,16 @@ function Card({ post, getHashTag }) {
           handleLikes={handleLikes}
           hashtags={hashtags}
           chatRoom={chatRoom}
-          setShowChatMdoal={setShowChatMdoal}
+          setShowChatModal={setShowChatModal}
         />
       )}
       {showChatModal && (
-        <ChatModal chatRoom={chatRoom} setShowChatModal={setShowChatMdoal} />
+        <ChatModal
+          chatRoom={chatRoom}
+          setShowChatModal={setShowChatModal}
+          showChatModal={showChatModal}
+          handleChatRoom={handleChatRoom}
+        />
       )}
     </div>
   );
