@@ -577,6 +577,43 @@ app.post("/chatroom", async (req, res) => {
   }
 });
 
+// 나의 채팅 리스트 가져오기
+app.get("/chat-list/:username", async (req, res) => {
+  const loginUsername = req.params.username;
+  try {
+    // 채팅방 목록을 가져온 다음, 각 채팅방에 대한 최신 메시지 미리보기를 가져오기..
+    const chatList = await db
+      .collection("chatroom")
+      .find({
+        member: { $all: [loginUsername] },
+      })
+      .toArray();
+
+    const chatListWithPreviews = await Promise.all(
+      chatList.map(async (chatRoom) => {
+        // 가장 최신 메시지 가져오기
+        const latestMsg = await db
+          .collection("chat-msg")
+          .find({ parent_id: chatRoom._id })
+          .sort({ date: -1 })
+          .limit(1)
+          .toArray();
+
+        const textPreview = latestMsg.length > 0 ? latestMsg[0] : null;
+        return {
+          ...chatRoom,
+          textPreview,
+        };
+      })
+    );
+
+    res.json(chatListWithPreviews);
+  } catch (error) {
+    console.error("채팅 리스트 가져오기 실패:", error);
+    res.status(500).json({ error: "채팅 리스트 가져오기 실패." });
+  }
+});
+
 // 채팅 이력 가져오기
 app.get("/chat-history/:roomId", async (req, res) => {
   try {

@@ -1,52 +1,105 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import io from "socket.io-client";
+import axios from "axios";
 import "../assets/styles/ChatLayout.css";
+import ChatArea from "./ChatArea";
 
 const socket = io("http://localhost:8080");
 
 function ChatLayout() {
   const loginUserInfo = useSelector((state) => state.user.userInfo);
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
+  const [myChatList, setMyChatList] = useState([]);
+  const [chatRoom, setChatRoom] = useState(null);
+  const [info, setInfo] = useState(false);
+  const [chatRoomId, setRoomId] = useState(null);
+  const [upDate, setUpdate] = useState(false);
 
   useEffect(() => {
-    socket.on("receiveMessage", (message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
+    if (!loginUserInfo) {
+      setInfo(true);
+      return;
+    }
+
+    const getMyChatList = async () => {
+      try {
+        const response = await axios.get(
+          `/chat-list/${loginUserInfo.username}`
+        );
+        setMyChatList(response.data);
+      } catch (error) {
+        console.error("채팅 목록을 불러오는데 실패:", error);
+      }
+    };
+
+    getMyChatList();
+    setUpdate(false);
+  }, [loginUserInfo, upDate]);
+
+  useEffect(() => {
+    socket.on("new-chat-room", (newChatRoom) => {
+      setChatRoom(newChatRoom);
     });
 
     return () => {
-      socket.off("receiveMessage");
+      socket.off("new-chat-room");
     };
   }, []);
 
-  const sendMessage = () => {
-    if (message.trim()) {
-      const newMessage = { user: loginUserInfo.username, text: message };
-      socket.emit("sendMessage", newMessage);
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
-      setMessage("");
-    }
-  };
+  function goToChatRoom(room) {
+    setRoomId(room._id);
+    setChatRoom(room);
+  }
+
+  function getChatRoomTitle(chatRoom, username) {
+    return chatRoom ? chatRoom.member.filter((m) => m !== username) : [];
+  }
 
   return (
     <div className="chat-container">
-      <div className="messages">
-        {messages.map((msg, index) => (
-          <div key={index} className="message">
-            <strong>{msg.user}</strong>: {msg.text}
+      {info ? (
+        <div className="need-to-login">
+          로그인이 필요한 서비스입니다. 로그인을 완료해주세요!
+        </div>
+      ) : (
+        <>
+          <div className="chat-list-area">
+            {myChatList.map((room) => (
+              <div key={room._id} className="chat-room-menu">
+                {/* 채팅룸 제목 표시 (상대 username) */}
+                <a
+                  onClick={() => {
+                    goToChatRoom(room); // 수정된 부분
+                  }}
+                >
+                  <p className="chat-room-title">
+                    {getChatRoomTitle(room, loginUserInfo.username).join(", ")}
+                  </p>
+                  <p className="text-preview">
+                    {/* 최신 메시지 미리보기 표시 */}
+                    {room.textPreview
+                      ? room.textPreview.msg
+                      : "최신 메시지가 존재하지 않습니다."}
+                  </p>
+                </a>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      <div className="message-input">
-        <input
-          type="text"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && sendMessage()}
-        />
-        <button onClick={sendMessage}>보내기</button>
-      </div>
+          <div className="chat-room-area">
+            {chatRoomId ? (
+              <div>
+                <ChatArea
+                  chatRoomId={chatRoomId}
+                  chatRoom={chatRoom}
+                  setUpdate={setUpdate}
+                />{" "}
+              </div> // 수정된 부분
+            ) : (
+              <div>채팅방을 선택하세요.</div> // 수정된 부분
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -9,6 +9,7 @@ import { setUser } from "./store/slices/userSlice";
 function App() {
   const dispatch = useDispatch();
   const token = useSelector((state) => state.user.token);
+  const loginUserInfo = useSelector((state) => state.user.userInfo);
 
   useEffect(() => {
     const storedToken = sessionStorage.getItem("jwtToken");

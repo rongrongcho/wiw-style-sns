@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Routes, Route, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setUser } from "../store/slices/userSlice";
 import "../assets/styles/Layout.css";
 import Login from "./Login";
 import SignUp from "./SignUp";
@@ -20,6 +21,7 @@ const IMAGES = {
 };
 
 function Layout() {
+  const dispatch = useDispatch();
   const [showModal, setModal] = useState(null);
   const [showSideMenu, setSideMenu] = useState(false);
   const loginUserInfo = useSelector((state) => state.user.userInfo);
@@ -27,6 +29,32 @@ function Layout() {
   const [showWrite, setWrite] = useState(false);
   const location = useLocation();
   const urlPath = location.pathname; // 현재 path 경로만 저장
+  const [chatKey, setChatKey] = useState(0);
+
+  useEffect(() => {
+    const storedToken = sessionStorage.getItem("jwtToken");
+    if (storedToken) {
+      axios
+        .post("http://localhost:8080/verifyToken", { token: storedToken })
+        .then((response) => {
+          if (response.data.valid) {
+            dispatch(
+              setUser({ token: storedToken, userInfo: response.data.userInfo })
+            );
+          } else {
+            sessionStorage.removeItem("jwtToken");
+          }
+        })
+        .catch(() => {
+          sessionStorage.removeItem("jwtToken");
+        });
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    // 로그인 상태가 변할 때마다 chatKey를 업데이트하여 ChatLayout을 재렌더링
+    setChatKey((prevKey) => prevKey + 1);
+  }, [loginUserInfo]);
 
   function openSideMenu() {
     setSideMenu(true);
@@ -155,7 +183,7 @@ function Layout() {
       )}
 
       {urlPath === "/chat" ? (
-        <ChatLayout />
+        <ChatLayout key={chatKey} />
       ) : (
         <ContentLayout showSideMenu={showSideMenu} IMAGES={IMAGES} />
       )}
