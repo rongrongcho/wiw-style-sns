@@ -6,6 +6,7 @@ import "../assets/styles/ContentLayout.css";
 function ContentLayout({ showSideMenu, IMAGES }) {
   const [posts, setPosts] = useState([]);
   const [sortOrder, setSortOrder] = useState("default"); // 정렬 상태
+  const [searchKey, setSearchKey] = useState("");
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -45,12 +46,25 @@ function ContentLayout({ showSideMenu, IMAGES }) {
       setSortOrder(order);
     }
   };
-
+  // 검색창 검색
+  async function search(keyword) {
+    try {
+      const response = await axios.get(`/search-bar`, {
+        params: { keyword }, // query parameter로 전달
+      });
+      setPosts(response.data);
+    } catch (error) {
+      console.error(`검색 실패: ${keyword}`, error);
+    }
+  }
   // 해시태그 검색
   const searchHashtag = async (hashtag) => {
     try {
-      const response = await axios.get(`/search/${hashtag}`);
+      const response = await axios.get(`/search-bar`, {
+        params: { keyword: `#${hashtag}` }, // 해시태그 포함 쿼리 전달
+      });
       setPosts(response.data);
+      setSearchKey("#" + hashtag);
     } catch (error) {
       console.error(`해시태그 검색 실패: ${hashtag}`, error);
     }
@@ -84,8 +98,20 @@ function ContentLayout({ showSideMenu, IMAGES }) {
           </p>
         </div>
         <div className="search-box">
-          <input type="text" className="search-bar" />
-          <button type="submit" className="search-btn">
+          <input
+            type="text"
+            className="search-bar"
+            onChange={(e) => setSearchKey(e.target.value)}
+            onFocus={() => setSearchKey("")}
+            value={searchKey}
+          />
+          <button
+            type="submit"
+            className="search-btn"
+            onClick={() => {
+              search(searchKey);
+            }}
+          >
             <img src={IMAGES.SEARCH_BTN} alt="검색 버튼" />
           </button>
         </div>

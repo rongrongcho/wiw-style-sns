@@ -275,8 +275,41 @@ app.get("/api/posts", async (req, res) => {
     return res.status(500).json({ message: "게시글 조회 실패", error });
   }
 });
+// 써치바 검색
+app.get("/search-bar", async (req, res) => {
+  const keyword = req.query.keyword;
+  console.log("검색어: " + keyword);
 
-// 해시태그 검색
+  try {
+    let posts;
+    if (keyword.startsWith("#")) {
+      const hashtag = keyword.slice(1); // 해시태그에서 '#' 제거
+      posts = await db.collection("post").find({ hashtags: hashtag }).toArray();
+      console.log("성공적으로 해시태그를 검색했음");
+    } else if (keyword.startsWith("@")) {
+      const username = keyword.slice(1);
+      posts = await db
+        .collection("post")
+        .find({ username: { $regex: username, $options: "i" } })
+        .toArray();
+      console.log("성공적으로 유저명을 검색했음");
+    } else {
+      posts = await db
+        .collection("post")
+        .find({ $text: { $search: keyword } })
+        .toArray();
+      console.log("기본 검색을 수행했음");
+    }
+
+    console.log(posts);
+    return res.status(200).json(posts);
+  } catch (error) {
+    console.error("검색 실패:", error);
+    return res.status(500).json({ message: "검색 실패", error });
+  }
+});
+
+//해시태그 검색
 app.get("/search/:hashtag", async (req, res) => {
   const hashtag = req.params.hashtag;
   try {

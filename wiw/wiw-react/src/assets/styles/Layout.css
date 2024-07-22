@@ -26,6 +26,7 @@
   transform: translate(-50%, -50%);
   width: 70px;
   height: 70px;
+  z-index: 999;
 }
 
 .top-logo-area > a {
