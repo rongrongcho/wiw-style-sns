@@ -14,6 +14,7 @@ function Card({ post, getHashTag }) {
   const [liked, setLiked] = useState(false);
   const likedBtn = "/images/scrap-on-btn.png";
   const unlikedBtn = "/images/scrap-off-btn.png";
+  const [cLayoutKey, setCLayoutKey] = useState(0);
   const btnImage = liked ? likedBtn : unlikedBtn;
   // 채팅 기능을 위한 상태 변수
   const [chatRoom, setChatRoom] = useState(null);
@@ -23,7 +24,11 @@ function Card({ post, getHashTag }) {
     if (loginUserInfo && loginUserInfo.username) {
       setLiked(post.likes.includes(loginUserInfo.username));
     }
-  }, [loginUserInfo, post.likes, post]);
+  }, [loginUserInfo]);
+
+  useEffect(() => {
+    setCLayoutKey((prevKey) => prevKey + 1);
+  }, [setLiked]);
 
   const hashtags = post.hashtags.map((hashtag, index) => (
     <span key={index} className="hash-tag" onClick={() => getHashTag(hashtag)}>
@@ -104,6 +109,7 @@ function Card({ post, getHashTag }) {
       </div>
       {showDetailModal && (
         <Detail
+          key={cLayoutKey}
           post={post}
           setDetailModal={setDetailModal}
           setLiked={setLiked}

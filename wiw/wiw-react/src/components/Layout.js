@@ -162,10 +162,10 @@ function Layout() {
               <a href="#">Closet</a>
               <ul className="sub-menu-box">
                 <li className="sub-menu-btns">
-                  <a href="#">My Codi</a>
+                  <a href="/my-codi">My Codi</a>
                 </li>
                 <li className="sub-menu-btns">
-                  <a href="#">Scrap</a>
+                  <a href="/my-scrap">Scrap</a>
                 </li>
               </ul>
             </li>

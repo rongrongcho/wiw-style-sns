@@ -25,18 +25,50 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
-
+// Socket.IO 연결 및 이벤트 처리
 io.on("connection", (socket) => {
   console.log("새로운 클라이언트 연결");
 
-  socket.on("sendMessage", (message) => {
-    io.emit("receiveMessage", message);
+  socket.on("ask-join", (data) => {
+    socket.join(data);
+    console.log("룸 가입 완료");
+  });
+  //클라이언트가 보낸 메세지 수신하고 데이터 저장하고 다시 리턴해주기
+  socket.on("chat-msg", async (data) => {
+    try {
+      socket.join(data.roomName);
+
+      //디비 저장하기
+      const result = await db.collection("chat-msg").insertOne({
+        parent_id: new ObjectId(data.parent_id),
+        msg: data.msg,
+        sender: data.sender,
+        receiver: data.receiver,
+        date: new Date(),
+      });
+      console.log("메세지 디비 저장 성공");
+      // 새로운 메세지 전송하기
+      io.to(data.roomName).emit("new-message", {
+        msg: data.msg,
+        sender: data.sender,
+        date: new Date(),
+      });
+    } catch (error) {
+      console.error("메세지 전송 오류:", error);
+    }
+  });
+
+  //방떠나기
+  socket.on("leave-room", (roomName) => {
+    socket.leave(roomName);
+    console.log(`User left room: ${roomName}`);
   });
 
   socket.on("disconnect", () => {
     console.log("클라이언트 연결 해제");
   });
 });
+
 // ====================================================
 
 const s3 = new S3Client({
@@ -267,9 +299,27 @@ app.post("/logout", (req, res) => {
 
 // 게시글 목록 조회
 app.get("/api/posts", async (req, res) => {
+  const { where, loginUser } = req.query;
   try {
-    const posts = await db.collection("post").find({}).toArray();
-    return res.status(200).json(posts);
+    if (!where && !loginUser) {
+      const posts = await db.collection("post").find({}).toArray();
+      return res.status(200).json(posts);
+    } else if (where === "my-codi" && loginUser) {
+      const posts = await db
+        .collection("post")
+        .find({ username: loginUser })
+        .toArray();
+      return res.status(200).json(posts);
+    } else if (where === "my-scrap" && loginUser) {
+      const user = await db.collection("user").findOne({ username: loginUser });
+      const likedPost = user.likes;
+      const posts = await db
+        .collection("post")
+        .find({ _id: { $in: likedPost.map((id) => new ObjectId(id)) } })
+        .toArray();
+      console.log("성공의 맛 ");
+      return res.status(200).json(posts);
+    }
   } catch (error) {
     console.error("게시글 조회 실패:", error);
     return res.status(500).json({ message: "게시글 조회 실패", error });
@@ -522,50 +572,6 @@ app.post("/deletePost", async (req, res) => {
 
 //=================================================================
 //실시간 채팅 기능 만들기 (db저장도)
-
-// Socket.IO 연결 및 이벤트 처리
-io.on("connection", (socket) => {
-  console.log("새로운 클라이언트 연결");
-
-  socket.on("ask-join", (data) => {
-    socket.join(data);
-    console.log("룸 가입 완료");
-  });
-  //클라이언트가 보낸 메세지 수신하고 데이터 저장하고 다시 리턴해주기
-  socket.on("chat-msg", async (data) => {
-    try {
-      socket.join(data.roomName);
-
-      //디비 저장하기
-      const result = await db.collection("chat-msg").insertOne({
-        parent_id: new ObjectId(data.parent_id),
-        msg: data.msg,
-        sender: data.sender,
-        receiver: data.receiver,
-        date: new Date(),
-      });
-      console.log("메세지 디비 저장 성공");
-      // 새로운 메세지 전송하기
-      io.to(data.roomName).emit("new-message", {
-        msg: data.msg,
-        sender: data.sender,
-        date: new Date(),
-      });
-    } catch (error) {
-      console.error("메세지 전송 오류:", error);
-    }
-  });
-
-  //방떠나기
-  socket.on("leave-room", (roomName) => {
-    socket.leave(roomName);
-    console.log(`User left room: ${roomName}`);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("클라이언트 연결 해제");
-  });
-});
 
 app.post("/chatroom", async (req, res) => {
   const { loginUsername, postUsername } = req.body;
