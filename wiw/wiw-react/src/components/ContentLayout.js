@@ -168,7 +168,7 @@ function ContentLayout({ showSideMenu, IMAGES }) {
         </div>
       </div>
       {info ? (
-        <div className="info-to-client">게시글이 존재하지않습니다</div>
+        <div className="info-to-client">검색 결과가 존재하지 않습니다.</div>
       ) : (
         <div className={showSideMenu ? "content-box-narrow" : "content-box"}>
           {cards}

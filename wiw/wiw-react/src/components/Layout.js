@@ -159,7 +159,7 @@ function Layout() {
               <a href="/">Home</a>
             </li>
             <li className="main-menu-btns closet-btn">
-              <a href="#">Closet</a>
+              <a href="/my-codi">Closet</a>
               <ul className="sub-menu-box">
                 <li className="sub-menu-btns">
                   <a href="/my-codi">My Codi</a>

@@ -17,6 +17,7 @@ function SignUp({ setModal }) {
       });
 
       setVMsg("회원가입 성공!");
+      alert("회원 가입 성공! 로그인 해주세요!");
 
       // 회원가입 성공 시 모달 닫기
       setModal(false);
