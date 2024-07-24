@@ -7,7 +7,7 @@ import ChatModal from "./ChatModal";
 import io from "socket.io-client";
 const socket = io("http://localhost:8080");
 
-function Card({ post, getHashTag, isDetailOpen }) {
+function Card({ post, getHashTag, setStopFetch }) {
   const [showDetailModal, setDetailModal] = useState(false);
   const loginUserInfo = useSelector((state) => state.user.userInfo);
   const postUsername = post.username;
@@ -72,6 +72,7 @@ function Card({ post, getHashTag, isDetailOpen }) {
           postId: post._id,
         });
         setLiked(!liked);
+        setStopFetch(false);
         console.log(response.data);
       }
     } catch (error) {
@@ -81,7 +82,7 @@ function Card({ post, getHashTag, isDetailOpen }) {
 
   return (
     <div className="card-box">
-      <a href="#">
+      <div>
         <p
           className="card-img-box"
           onClick={() => {
@@ -94,7 +95,7 @@ function Card({ post, getHashTag, isDetailOpen }) {
             alt="카드 이미지"
           />
         </p>
-      </a>
+      </div>
       <div className="card-content-box">
         <p className="user-info">{post.username}</p>
         <p className="scrap-btn">
@@ -117,7 +118,7 @@ function Card({ post, getHashTag, isDetailOpen }) {
           hashtags={hashtags}
           chatRoom={chatRoom}
           setShowChatModal={setShowChatModal}
-          isDetailOpen={isDetailOpen}
+          setStopFetch={setStopFetch}
         />
       )}
       {showChatModal && (

@@ -13,7 +13,7 @@ function ContentLayout({ showSideMenu, IMAGES }) {
   const urlPath = location.pathname; // 현재 path 경로만 저장
   const loginUserInfo = useSelector((state) => state.user.userInfo);
   const [info, setInfo] = useState(false);
-  const [detailOpen, isDetailOpen] = useState(false);
+  const [stopFetch, setStopFetch] = useState(false);
 
   // 게시글 데이터를 가져오는 함수
   const fetchPosts = async () => {
@@ -48,14 +48,12 @@ function ContentLayout({ showSideMenu, IMAGES }) {
 
   // 페이지 로드 시 게시글을 가져오고 폴링 시작
   useEffect(() => {
-    if (!detailOpen) {
+    if (!stopFetch) {
       fetchPosts();
-      const intervalId = setInterval(fetchPosts, 100); // 폴링 간격 조정
+      const intervalId = setInterval(fetchPosts, 100);
       return () => clearInterval(intervalId);
-    } else {
-      clearInterval(fetchPosts);
     }
-  }, [urlPath, loginUserInfo, detailOpen]);
+  }, [urlPath, loginUserInfo, stopFetch]);
 
   // 정렬 버튼 기능
   const sortPosts = (posts, order) => {
@@ -76,13 +74,7 @@ function ContentLayout({ showSideMenu, IMAGES }) {
 
   // 정렬 버튼 클릭 핸들러
   const handleSortChange = (order) => {
-    if (sortOrder === order) {
-      // 현재 정렬 기준과 동일하면 디폴트 상태로 리셋
-      setSortOrder("default");
-    } else {
-      // 새로운 정렬 기준으로 변경
-      setSortOrder(order);
-    }
+    setSortOrder(sortOrder === order ? "default" : order);
   };
 
   // 검색창 검색
@@ -91,6 +83,7 @@ function ContentLayout({ showSideMenu, IMAGES }) {
       const response = await axios.get(`/search-bar`, {
         params: { keyword },
       });
+      setStopFetch(true);
       if (response.data.length > 0) {
         setPosts(response.data);
         setInfo(false);
@@ -108,9 +101,10 @@ function ContentLayout({ showSideMenu, IMAGES }) {
   // 해시태그 검색
   const searchHashtag = async (hashtag) => {
     try {
-      const response = await axios.get(`/search-bar`, {
+      const response = await axios.get("/search-bar", {
         params: { keyword: `#${hashtag}` }, // 해시태그 포함
       });
+      setStopFetch(true);
       if (response.data.length > 0) {
         setPosts(response.data);
         setSearchKey("#" + hashtag);
@@ -132,7 +126,7 @@ function ContentLayout({ showSideMenu, IMAGES }) {
       <Card
         post={post}
         getHashTag={searchHashtag}
-        isDetailOpen={isDetailOpen}
+        setStopFetch={setStopFetch}
       />
     </div>
   ));

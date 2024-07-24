@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { setUser } from "../store/slices/userSlice";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import "../assets/styles/WriteEdit.css";
-
 import axios from "axios";
+
 const IMAGES = {
   LOGO: "images/top-logo-1px.png",
   MENU_BTN: "images/menu_active_btn.png",
@@ -18,7 +17,6 @@ function Write({ setWrite }) {
   const [content, setContent] = useState("");
   const [hashtags, setHashtags] = useState([]);
   const [newTag, setNewTag] = useState("");
-  // const [postData, setPostData] = useState(null);
 
   const handleFileChange = (e) => {
     if (e.target.files.length + selectedFiles.length > 3) {
@@ -44,7 +42,11 @@ function Write({ setWrite }) {
       alert("해시태그는 최대 5개까지 추가할 수 있습니다.");
       return;
     }
-    setHashtags((prevTags) => [...prevTags, `#${trimmedTag}`]);
+    if (trimmedTag.length > 12) {
+      alert("해시태그는 최대 12자까지 가능합니다.");
+      return;
+    }
+    setHashtags((prevTags) => [...prevTags, `${trimmedTag}`]);
     setNewTag("");
   };
 
@@ -61,7 +63,7 @@ function Write({ setWrite }) {
     }
     for (const tag of hashtags) {
       if (tag.length > 12) {
-        alert("각 해시태그는 최대 10자까지 가능합니다.");
+        alert("각 해시태그는 최대 12자까지 가능합니다.");
         return false;
       }
     }
@@ -88,10 +90,6 @@ function Write({ setWrite }) {
     const pureTextTags = hashtags.map((tag) => tag.replace(/^#/, ""));
     formData.append("hashtags", JSON.stringify(pureTextTags));
     formData.append("userInfo", JSON.stringify(loginUserInfo.username));
-    // 디버깅을 위한 코드
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
 
     try {
       if (loginUserInfo.username == null) {
@@ -103,7 +101,6 @@ function Write({ setWrite }) {
         },
       });
 
-      // setPostData(response.data.post);
       alert("업로드 성공!");
       setWrite(false);
       setSelectedFiles([]);
@@ -131,35 +128,38 @@ function Write({ setWrite }) {
       </p>
       <form className="img-upload-form" onSubmit={handleSubmit}>
         <div className="preview-box">
-          {selectedFiles.map((file, index) => (
-            <div key={index} className="image-preview">
-              <img
-                src={URL.createObjectURL(file)}
-                alt={`미리보기 ${index}`}
-                className="preview-img"
-              />
-              <button
-                type="button"
-                onClick={() => handleRemoveImg(index)}
-                className="remove-btn"
-              >
-                제거
-              </button>
+          {selectedFiles.length === 0 ? (
+            <div className="no-images-msg">
+              <p>
+                선택된 이미지가 없습니다.
+                <br />
+                이미지는 최소 1장, 최대 3장까지 선택 가능합니다.
+              </p>
             </div>
-          ))}
+          ) : (
+            selectedFiles.map((file, index) => (
+              <div key={index} className="image-preview">
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt={`미리보기 ${index}`}
+                  className="preview-img"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImg(index)}
+                  className="remove-btn"
+                >
+                  remove
+                </button>
+              </div>
+            ))
+          )}
         </div>
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={handleFileChange}
-          required
-        />
 
         <div className="tag-container">
           {hashtags.map((tag, index) => (
             <div key={index} className="tag-item">
-              <span>{tag}</span>
+              <span>#{tag}</span>
               <button
                 type="button"
                 onClick={() => handleRemoveTag(index)}
@@ -169,20 +169,32 @@ function Write({ setWrite }) {
               </button>
             </div>
           ))}
-          <div className="new-tag-container">
-            <input
-              type="text"
-              value={newTag}
-              onChange={handleTagChange}
-              placeholder="#해시태그"
-            />
-            <button type="button" onClick={handleAddTag}>
-              추가
-            </button>
-          </div>
+        </div>
+        <input
+          className="img-input"
+          type="file"
+          accept="image/*"
+          id="img-file-seletor"
+          multiple
+          onChange={handleFileChange}
+          required
+        />
+        <div className="new-tag-container">
+          <input
+            className="input-hashtag"
+            type="text"
+            value={newTag}
+            onChange={handleTagChange}
+            placeholder="해시태그를 입력하세요"
+          />
+          <button type="button" onClick={handleAddTag}>
+            추가
+          </button>
         </div>
 
-        <button type="submit">포스팅</button>
+        <button className="send-btn" type="submit">
+          포스팅
+        </button>
       </form>
     </div>
   );
