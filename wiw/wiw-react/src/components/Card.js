@@ -19,7 +19,6 @@ function Card({ post, getHashTag, setStopFetch }) {
   // 채팅 기능을 위한 상태 변수
   const [chatRoom, setChatRoom] = useState(null);
   const [showChatModal, setShowChatModal] = useState(false); // 여기 수정
-
   useEffect(() => {
     if (loginUserInfo && loginUserInfo.username) {
       setLiked(post.likes.includes(loginUserInfo.username));
@@ -82,7 +81,7 @@ function Card({ post, getHashTag, setStopFetch }) {
 
   return (
     <div className="card-box">
-      <div>
+      <a>
         <p
           className="card-img-box"
           onClick={() => {
@@ -95,9 +94,9 @@ function Card({ post, getHashTag, setStopFetch }) {
             alt="카드 이미지"
           />
         </p>
-      </div>
+      </a>
       <div className="card-content-box">
-        <p className="user-info">{post.username}</p>
+        <p className="user-info">@{post.username}</p>
         <p className="scrap-btn">
           <span className="scrap-cout-text">{post.likes.length}</span>
           <br />

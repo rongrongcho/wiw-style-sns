@@ -143,13 +143,13 @@ function ContentLayout({ showSideMenu, IMAGES }) {
             className={`sort-btns ${sortOrder === "scrap" ? "active" : ""}`}
             onClick={() => handleSortChange("scrap")}
           >
-            스크랩순
+            Scrap
           </p>
           <p
             className={`sort-btns ${sortOrder === "date" ? "active" : ""}`}
             onClick={() => handleSortChange("date")}
           >
-            날짜순
+            Date
           </p>
         </div>
         <div className="search-box">
@@ -162,7 +162,7 @@ function ContentLayout({ showSideMenu, IMAGES }) {
           />
           <button
             type="submit"
-            className="search-btn"
+            className={showSideMenu ? "search-btn-narrow" : "search-btn"}
             onClick={() => search(searchKey)}
           >
             <img src={IMAGES.SEARCH_BTN} alt="검색 버튼" />
@@ -170,7 +170,7 @@ function ContentLayout({ showSideMenu, IMAGES }) {
         </div>
       </div>
       {info ? (
-        <div className="info-to-client">검색 결과가 존재하지 않습니다.</div>
+        <div className="info-to-client">포스팅이 존재하지않습니다.</div>
       ) : (
         <div className={showSideMenu ? "content-box-narrow" : "content-box"}>
           {cards}

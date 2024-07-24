@@ -68,7 +68,7 @@ function Layout() {
     <div className="container">
       <nav>
         <div className="top-nav">
-          <h1 className="top-logo-area">
+          <h1 className={showSideMenu ? "logo-area-narrow" : "top-logo-area"}>
             <a href="/">
               <img src={IMAGES.LOGO} alt="wiw 로고 이미지" />
             </a>
@@ -105,7 +105,7 @@ function Layout() {
                   }}
                   className="user-active-btn"
                 >
-                  sign/up
+                  sign-up
                 </p>
               </div>
             )}

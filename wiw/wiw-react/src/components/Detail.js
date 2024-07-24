@@ -131,16 +131,22 @@ function Detail({ post, setDetailModal, handleLikes, hashtags, setStopFetch }) {
       <div className="slider">
         {images.length > 0 && (
           <>
-            <button className="prev-btn" onClick={handlePrevImage}>
-              &lt;
-            </button>
+            {/* 이미지 개수가 1개일 때는 화살표를 보이지 않도록 함 */}
+            {images.length > 1 && (
+              <button className="prev-btn arrows" onClick={handlePrevImage}>
+                &lt;
+              </button>
+            )}
             <div className="slider-images">{imgArr[currentImgIdx]}</div>
-            <button className="next-btn" onClick={handleNextImage}>
-              &gt;
-            </button>
+            {images.length > 1 && (
+              <button className="next-btn arrows" onClick={handleNextImage}>
+                &gt;
+              </button>
+            )}
           </>
         )}
       </div>
+
       {showChatModal && (
         <ChatModal
           chatRoom={chatRoom}
@@ -152,33 +158,51 @@ function Detail({ post, setDetailModal, handleLikes, hashtags, setStopFetch }) {
       <div className="detail-content-box">
         {postMaster ? (
           <div>
-            <p className="d-user-info">{post.username}</p>
-            <p className="scrap-btn">
-              <span className="scrap-cout-text">{post.likes.length}</span>
-              <br />
-              <img src={btnImage} onClick={handleLikes} alt="좋아요 버튼" />
-            </p>
-            <span className="edit-post-btn" onClick={editPost}>
-              edit
-            </span>
-            <span className="delete-post-btn" onClick={deletePost}>
-              delete
-            </span>
-            <div className="hash-tag-box">{hashtags}</div>
+            <div className="info-Container">
+              <div className="infoArea">
+                <p className="d-user-info">@{post.username}</p>
+                <div className="btns">
+                  <p className="d-scrap-btn scrap-btn">
+                    <br />
+                    <img
+                      src={btnImage}
+                      onClick={handleLikes}
+                      alt="좋아요 버튼"
+                    />
+                  </p>
+                  <span className="edit-post-btn" onClick={editPost}>
+                    edit
+                  </span>
+                  <span className="delete-post-btn" onClick={deletePost}>
+                    delete
+                  </span>
+                </div>
+              </div>
+
+              <div className="d-hash-tag-box">{hashtags}</div>
+            </div>
           </div>
         ) : (
           <div>
-            <p className="d-user-info">{post.username}</p>
-            <p className="scrap-btn">
-              <span className="scrap-cout-text">{post.likes.length}</span>
-              <br />
-              <img src={btnImage} onClick={handleLikes} alt="좋아요 버튼" />
-            </p>
-
-            <p className="chat-btn" onClick={handleChatRoom}>
-              <img src="images/chat-btn.png" alt="채팅 버튼" />
-            </p>
-            <div className="hash-tag-box">{hashtags}</div>
+            <div className="info-Container">
+              <div className="infoArea">
+                <p className="d-user-info">@{post.username}</p>
+                <div className="btns">
+                  <p className="d-scrap-btn scrap-btn">
+                    <br />
+                    <img
+                      src={btnImage}
+                      onClick={handleLikes}
+                      alt="좋아요 버튼"
+                    />
+                  </p>
+                  <p className="d-chat-btn chat-btn" onClick={handleChatRoom}>
+                    <img src="images/chat-btn.png" alt="채팅 버튼" />
+                  </p>
+                </div>
+              </div>
+              <div className="d-hash-tag-box">{hashtags}</div>
+            </div>
           </div>
         )}
       </div>

@@ -31,7 +31,7 @@ function Login({ setModal }) {
       // 오류 처리
       if (error.response && error.response.data) {
         console.error("로그인 실패:", error.response.data);
-        setVMsg("로그인 실패: " + error.response.data.message);
+        setVMsg(error.response.data.message);
       } else {
         console.error("로그인 요청 오류:", error.message);
         setVMsg("로그인 요청 중 오류가 발생했습니다.");
@@ -81,7 +81,7 @@ function Login({ setModal }) {
           <span className="validation-msg">{vMsg}</span>
         </form>
         <div className="sign-up-info">
-          <span>아직 회원이 아니신가요?</span>
+          <span>회원이 아니신가요?</span>
           <p onClick={() => setModal("sign-up")}>회원가입 하기</p>
         </div>
       </div>

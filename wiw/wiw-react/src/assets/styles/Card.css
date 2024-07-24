@@ -1,17 +1,17 @@
 .card-box {
   width: 100%;
   height: 100%;
-
   box-sizing: border-box;
-  border-radius: 15px;
+  /* border-radius: 15px; */
+  background-color: #fff;
+  cursor: default;
 }
 
 .card-img-box {
   position: relative;
   width: 100%;
-  border-radius: 15px 15px 0 0;
+  /* border-radius: 15px 15px 0 0; */
   height: 75%;
-  background-color: aqua;
 }
 
 .card-img {
@@ -19,17 +19,18 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
-  border-radius: 15px 15px 0 0;
+  /* border-radius: 15px 15px 0 0; */
 }
 
 .card-content-box {
   position: relative;
   width: 100%;
   height: 25%;
-  background-color: #f0f0f0;
+  background-color: #f4f2f2;
   padding: 5%;
-  border-radius: 0 0 15px 15px;
+  /* border-radius: 0 0 15px 15px; */
   box-sizing: border-box;
+  cursor: default;
 }
 
 .user-info {
@@ -38,23 +39,17 @@
   width: 50%;
   height: 20%;
   top: 10%;
-
   left: 0;
-  font-size: 16pt;
+  font-size: 15pt;
   margin-bottom: 8%;
-  font-weight: bold;
 }
 
 .scrap-btn {
   position: absolute;
   top: 8%;
-  right: 12%;
+  right: 8%;
   width: 25px;
   height: 25px;
-}
-.scrap-btn:hover {
-  width: 28px;
-  height: 28px;
 }
 
 .scrap-btn > img {
@@ -75,11 +70,6 @@
   height: 25px;
 }
 
-.chat-btn:hover {
-  width: 33px;
-  height: 27px;
-}
-
 .chat-btn > img {
   width: 100%;
   height: 100%;
@@ -91,13 +81,13 @@
   font-size: 14pt;
   width: 100%;
   height: 70%;
+  cursor: default;
 }
 
 .hash-tag {
   display: inline-block;
   margin-right: 2%;
   margin-bottom: 2%;
-  background-color: pink;
 }
 
 .hash-tag:hover {
