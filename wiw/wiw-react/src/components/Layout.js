@@ -127,28 +127,17 @@ function Layout() {
           >
             <img src={IMAGES.CLOSE_BTN} alt="사이드 메뉴 닫기 버튼" />
           </p>
-          <Logout setMember={setMember} />
 
           <button
+            className="write-btn"
             onClick={() => {
               setWrite(true);
             }}
           >
-            글쓰기
+            write
           </button>
-          {showWrite && (
-            <div className="write-modal">
-              <p
-                className="write-close-btn"
-                onClick={() => {
-                  setWrite(false);
-                }}
-              >
-                <img src={IMAGES.CLOSE_BTN} alt="사이드 메뉴 닫기 버튼" />
-              </p>
-              <Write setWrite={setWrite} />
-            </div>
-          )}
+          {showWrite && <Write setWrite={setWrite} />}
+          <Logout setMember={setMember} />
         </div>
       )}
 

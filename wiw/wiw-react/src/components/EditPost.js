@@ -111,9 +111,9 @@ function EditPost({ setEditModal, post }) {
   };
 
   return (
-    <div className="red">
+    <div className="write-edit-modal">
       <p
-        className="close-btn"
+        className="w-e-close-btn"
         onClick={() => {
           setEditModal(false);
         }}
@@ -121,12 +121,6 @@ function EditPost({ setEditModal, post }) {
         <img src="/images/close-btn.png" alt="모달창 닫기 버튼" />
       </p>
       <form className="img-upload-form" onSubmit={handleSubmit}>
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={handleFileChange}
-        />
         <div className="preview-box">
           {selectedFiles.map((file, index) => (
             <div key={index} className="image-preview">
@@ -147,6 +141,12 @@ function EditPost({ setEditModal, post }) {
             </div>
           ))}
         </div>
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleFileChange}
+        />
 
         <div className="tag-container">
           {hashtags.map((tag, index) => (

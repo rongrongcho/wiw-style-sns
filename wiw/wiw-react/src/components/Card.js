@@ -7,7 +7,7 @@ import ChatModal from "./ChatModal";
 import io from "socket.io-client";
 const socket = io("http://localhost:8080");
 
-function Card({ post, getHashTag }) {
+function Card({ post, getHashTag, isDetailOpen }) {
   const [showDetailModal, setDetailModal] = useState(false);
   const loginUserInfo = useSelector((state) => state.user.userInfo);
   const postUsername = post.username;
@@ -117,6 +117,7 @@ function Card({ post, getHashTag }) {
           hashtags={hashtags}
           chatRoom={chatRoom}
           setShowChatModal={setShowChatModal}
+          isDetailOpen={isDetailOpen}
         />
       )}
       {showChatModal && (

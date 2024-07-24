@@ -13,6 +13,7 @@ function ContentLayout({ showSideMenu, IMAGES }) {
   const urlPath = location.pathname; // 현재 path 경로만 저장
   const loginUserInfo = useSelector((state) => state.user.userInfo);
   const [info, setInfo] = useState(false);
+  const [detailOpen, isDetailOpen] = useState(false);
 
   // 게시글 데이터를 가져오는 함수
   const fetchPosts = async () => {
@@ -47,11 +48,14 @@ function ContentLayout({ showSideMenu, IMAGES }) {
 
   // 페이지 로드 시 게시글을 가져오고 폴링 시작
   useEffect(() => {
-    fetchPosts();
-    const intervalId = setInterval(fetchPosts, 100);
-
-    return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 interval 정리
-  }, [urlPath, loginUserInfo]);
+    if (!detailOpen) {
+      fetchPosts();
+      const intervalId = setInterval(fetchPosts, 100); // 폴링 간격 조정
+      return () => clearInterval(intervalId);
+    } else {
+      clearInterval(fetchPosts);
+    }
+  }, [urlPath, loginUserInfo, detailOpen]);
 
   // 정렬 버튼 기능
   const sortPosts = (posts, order) => {
@@ -125,7 +129,11 @@ function ContentLayout({ showSideMenu, IMAGES }) {
 
   const cards = sortedPosts.map((post, index) => (
     <div key={index} className="content-item">
-      <Card post={post} getHashTag={searchHashtag} />
+      <Card
+        post={post}
+        getHashTag={searchHashtag}
+        isDetailOpen={isDetailOpen}
+      />
     </div>
   ));
 

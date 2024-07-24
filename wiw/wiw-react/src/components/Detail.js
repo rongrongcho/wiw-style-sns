@@ -7,7 +7,7 @@ import axios from "axios";
 import io from "socket.io-client";
 const socket = io("http://localhost:8080");
 
-function Detail({ post, setDetailModal, handleLikes, hashtags }) {
+function Detail({ post, setDetailModal, handleLikes, hashtags, isDetailOpen }) {
   const [currentImgIdx, setcurrentImgIdx] = useState(0);
   const loginUserInfo = useSelector((state) => state.user.userInfo);
   const images = post.images || []; // images 기본값 빈 배열 설정
@@ -89,6 +89,7 @@ function Detail({ post, setDetailModal, handleLikes, hashtags }) {
     try {
       setEditModal(true);
       // setDetailModal(false);
+      isDetailOpen(true);
     } catch (error) {}
   };
 
@@ -122,6 +123,7 @@ function Detail({ post, setDetailModal, handleLikes, hashtags }) {
         className="close-btn"
         onClick={() => {
           setDetailModal(false);
+          isDetailOpen(false);
         }}
       >
         <img src="/images/close-btn.png" alt="모달창 닫기 버튼" />

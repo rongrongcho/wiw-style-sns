@@ -1,7 +1,16 @@
 import React, { useState } from "react";
 import { setUser } from "../store/slices/userSlice";
 import { useSelector, useDispatch } from "react-redux";
+import "../assets/styles/WriteEdit.css";
+
 import axios from "axios";
+const IMAGES = {
+  LOGO: "images/top-logo-1px.png",
+  MENU_BTN: "images/menu_active_btn.png",
+  LOGIN_BTN: "images/loginbtn.png",
+  CLOSE_BTN: "images/close-btn.png",
+  SEARCH_BTN: "images/search-btn.png",
+};
 
 function Write({ setWrite }) {
   const loginUserInfo = useSelector((state) => state.user.userInfo);
@@ -111,15 +120,16 @@ function Write({ setWrite }) {
   };
 
   return (
-    <div>
+    <div className="write-edit-modal">
+      <p
+        className="w-e-close-btn"
+        onClick={() => {
+          setWrite(false);
+        }}
+      >
+        <img src={IMAGES.CLOSE_BTN} alt="사이드 메뉴 닫기 버튼" />
+      </p>
       <form className="img-upload-form" onSubmit={handleSubmit}>
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={handleFileChange}
-          required
-        />
         <div className="preview-box">
           {selectedFiles.map((file, index) => (
             <div key={index} className="image-preview">
@@ -138,6 +148,13 @@ function Write({ setWrite }) {
             </div>
           ))}
         </div>
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleFileChange}
+          required
+        />
 
         <div className="tag-container">
           {hashtags.map((tag, index) => (

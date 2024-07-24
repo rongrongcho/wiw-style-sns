@@ -27,7 +27,7 @@ function Logout({ setMember }) {
 
   return (
     <div className="logout-btn-box">
-      <button onClick={handleSubmit}>로그아웃</button>
+      <button onClick={handleSubmit}>LogOut</button>
     </div>
   );
 }
