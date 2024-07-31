@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import "../assets/styles/ChatArea.css";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import io from "socket.io-client";

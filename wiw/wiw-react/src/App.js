@@ -37,7 +37,6 @@ function App() {
         <Route path="/" element={<Layout />} />
         <Route path="/my-codi" element={<Layout />} />
         <Route path="/my-scrap" element={<Layout />} />
-
         <Route path="/chat" element={<Layout />} />
       </Routes>
     </div>

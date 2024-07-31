@@ -221,20 +221,20 @@
   opacity: 0;
   left: 100%;
   font-size: 14pt;
-  padding-left: 40px;
-  width: 140px;
+  /* padding-left: 40px; */
+  width: 100px;
   box-sizing: border-box;
   transition: visibility 0s, opacity 0.3s ease;
 }
 
 .closet-btn:hover .sub-menu-box {
-  top: -120px;
+  top: -20px;
   visibility: visible;
   opacity: 1;
   background-color: #fff;
-  height: 100vh;
+  /* height: 100vh; */
   border: 1px solid black;
-  /* z-index: 100; */
+  z-index: 999;
   /* border-right: 1px solid black; */
 }
 
@@ -242,11 +242,14 @@
 .sub-menu-btns {
   position: relative;
   right: 0;
-
   width: 100px;
   height: 50px;
   color: black;
   border-bottom: 1px solid black;
+}
+
+.sub-menu-btns:last-child {
+  border: none;
 }
 
 .sub-menu-btns:hover {
