@@ -3,7 +3,7 @@
   width: 100%;
   height: 100vh;
   box-sizing: border-box;
-  background-color: palegoldenrod;
+  cursor: default;
 }
 
 .chat-list-area {
@@ -11,18 +11,133 @@
   max-width: 20%;
   height: 100%;
   overflow-y: scroll;
-  background-color: pink;
-}
-
-.chat-room-area {
-  flex: 4;
-  height: 100%;
-  background-color: cadetblue;
+  cursor: default;
+  box-sizing: border-box;
+  border: 1px solid black;
+  border-top: none;
+  background-color: #fff;
+  overflow-y: scroll;
 }
 
 .chat-room-menu {
   width: 100%;
-  background-color: bisque;
-  height: 100px;
+  height: 80px;
+  background-color: #fff;
   border-bottom: 1px solid black;
+}
+
+.chat-room-menu:hover {
+  background-color: rgb(223, 223, 223);
+}
+
+.chat-room-menu > a {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 20px;
+  line-height: 1.3em;
+}
+
+.chat-room-title {
+  font-size: 1.2em;
+}
+
+.text-preview {
+  width: 100%;
+  white-space: nowrap;
+  font-size: 1em;
+  overflow: hidden;
+  color: rgb(94, 93, 93);
+  text-overflow: ellipsis;
+}
+
+.chat-room-area {
+  flex: 4;
+  width: 100%;
+  height: 100%;
+  cursor: default;
+  overflow-y: hidden;
+}
+
+.chat-area {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.chat-history {
+  width: 100%;
+  height: 80%;
+  overflow-y: scroll;
+}
+
+.chat-message {
+  position: relative;
+  max-width: 100%;
+  padding: 10px;
+  height: auto;
+  word-wrap: break-word;
+  border-bottom: 1px solid black;
+}
+
+.chat-message:last-child {
+  border: none;
+}
+
+.bubble-date-info {
+  color: rgb(117, 117, 116);
+  font-size: 0.7em;
+}
+
+.sent {
+  text-align: right;
+}
+
+.sent-strong {
+  display: none;
+}
+
+.received-strong {
+  background-color: black;
+  width: 30px;
+  height: 15px;
+  padding: 2px;
+  color: #fff;
+  margin-right: 5px;
+}
+
+.received {
+  text-align: left;
+}
+
+.bubble-input-area {
+  width: 100%;
+  height: 20%;
+  box-sizing: border-box;
+  padding: 10px;
+  border-top: 1px solid black;
+  background-color: #fff;
+}
+
+.send-msg-input {
+  position: relative;
+  width: 80%;
+  height: 30%;
+  border: 2px solid black;
+  border-radius: 25px;
+  box-sizing: border-box;
+}
+
+.send-msg-btn {
+  position: absolute;
+  right: 80px;
+  background-color: none;
+  width: 40px;
+  height: 40px;
+  top: 770px;
+  cursor: pointer;
+}
+
+.send-msg-btn > img {
+  width: 100%;
+  height: 100%;
 }

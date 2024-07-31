@@ -132,6 +132,7 @@ let connectDB = require("./database.js");
 const { ObjectId } = require("mongodb");
 const { error, timeStamp } = require("console");
 const { randomInt } = require("crypto");
+const moment = require("moment");
 let db;
 
 connectDB
@@ -657,10 +658,18 @@ app.get("/chat-list/:username", async (req, res) => {
 app.get("/chat-history/:roomId", async (req, res) => {
   try {
     const roomId = req.params.roomId;
-    const messages = await db
+    const messages1 = await db
       .collection("chat-msg")
       .find({ parent_id: new ObjectId(roomId) })
       .toArray();
+
+    const messages = messages1.map((message) => {
+      return {
+        ...message,
+        date: moment(message.date).format("YYYY-MM-DD HH:mm:ss"),
+      };
+    });
+
     res.json(messages);
   } catch (error) {
     res.status(500).send("서버 오류");

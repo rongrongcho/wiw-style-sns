@@ -1,15 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../assets/styles/ChatArea.css";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import io from "socket.io-client";
 
 const socket = io("http://localhost:8080");
+
 function ChatArea({ chatRoomId, chatRoom, setUpdate }) {
   const loginUserInfo = useSelector((state) => state.user.userInfo);
   const [chatText, setChatText] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
   const receiver = chatRoom.member.filter((m) => m !== loginUserInfo.username);
+  const chatHistoryRef = useRef(null);
+
   useEffect(() => {
     // 대화 가져오기
     const fetchChatHistory = async () => {
@@ -24,19 +27,30 @@ function ChatArea({ chatRoomId, chatRoom, setUpdate }) {
     fetchChatHistory();
 
     // 새로운 메시지를 받을 때
-    socket.on("new-message", (message) => {
+    const handleNewMessage = (message) => {
       setChatHistory((prevChatHistory) => [...prevChatHistory, message]);
-    });
+    };
+    socket.on("new-message", handleNewMessage);
+
     setUpdate(true);
 
     // 소켓 연결끊기
     return () => {
-      socket.off("new-message");
+      socket.off("new-message", handleNewMessage);
       socket.emit("leave-room", chatRoom.roomName);
     };
+  }, [chatRoomId, chatRoom.roomName, setUpdate]);
+
+  useEffect(() => {
+    // 채팅 기록이 업데이트되면 스크롤을 가장 아래로 이동
+    if (chatHistoryRef.current) {
+      chatHistoryRef.current.scrollTop = chatHistoryRef.current.scrollHeight;
+    }
   }, [chatHistory]);
 
   const handleSendMsg = async () => {
+    if (!chatText.trim()) return; // 공백 메시지 전송 방지
+
     try {
       socket.emit("chat-msg", {
         msg: chatText,
@@ -53,9 +67,15 @@ function ChatArea({ chatRoomId, chatRoom, setUpdate }) {
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSendMsg();
+    }
+  };
+
   return (
-    <div>
-      <div className="chat-history">
+    <div className="chat-area">
+      <div className="chat-history" ref={chatHistoryRef}>
         {chatHistory.map((message, index) => (
           <div
             key={index}
@@ -63,21 +83,36 @@ function ChatArea({ chatRoomId, chatRoom, setUpdate }) {
               message.sender === loginUserInfo.username ? "sent" : "received"
             }`}
           >
-            <strong>{message.sender}:</strong> {message.msg}
+            <p className="bubble-content">
+              <span
+                className={`${
+                  message.sender === loginUserInfo.username
+                    ? "sent-strong"
+                    : "received-strong"
+                }`}
+              >
+                {message.sender}
+              </span>
+
+              <span>{message.msg}</span>
+              <br />
+              <span className="bubble-date-info">{message.date}</span>
+            </p>
           </div>
         ))}
       </div>
 
-      <div>
+      <div className="bubble-input-area">
         <input
           className="send-msg-input"
           type="text"
           value={chatText}
           onChange={(e) => setChatText(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
-        <button className="send-msg-btn" onClick={handleSendMsg}>
-          전송
-        </button>
+        <p className="send-msg-btn" onClick={handleSendMsg}>
+          <img src="images/submit-btn-icon.png" alt="Send" />
+        </p>
       </div>
     </div>
   );

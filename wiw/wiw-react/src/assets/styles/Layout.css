@@ -183,9 +183,9 @@
 
 /* 메인 메뉴 박스 */
 .main-menu-box {
+  position: relative;
   cursor: default;
-
-  z-index: 900;
+  z-index: 999;
   position: absolute;
   top: 0;
   width: 180px;
@@ -233,8 +233,9 @@
   opacity: 1;
   background-color: #fff;
   height: 100vh;
-  z-index: 999;
-  border-right: 1px solid black;
+  border: 1px solid black;
+  /* z-index: 100; */
+  /* border-right: 1px solid black; */
 }
 
 /* 서브 메뉴 버튼 */

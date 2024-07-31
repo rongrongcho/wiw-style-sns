@@ -76,10 +76,11 @@ function ChatLayout() {
                     {getChatRoomTitle(room, loginUserInfo.username).join(", ")}
                   </p>
                   <p className="text-preview">
-                    {/* 최신 메시지 미리보기 표시 */}
+                    "{/* 최신 메시지 미리보기 표시 */}
                     {room.textPreview
                       ? room.textPreview.msg
                       : "최신 메시지가 존재하지 않습니다."}
+                    "
                   </p>
                 </a>
               </div>
@@ -87,15 +88,15 @@ function ChatLayout() {
           </div>
           <div className="chat-room-area">
             {chatRoomId ? (
-              <div>
+              <div className="chat-area">
                 <ChatArea
                   chatRoomId={chatRoomId}
                   chatRoom={chatRoom}
                   setUpdate={setUpdate}
                 />{" "}
-              </div> // 수정된 부분
+              </div>
             ) : (
-              <div>채팅방을 선택하세요.</div> // 수정된 부분
+              <div className="no-select-room">채팅방을 선택하세요.</div>
             )}
           </div>
         </>
