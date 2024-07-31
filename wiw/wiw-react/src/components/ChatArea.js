@@ -10,11 +10,12 @@ function ChatArea({ chatRoomId, chatRoom, setUpdate }) {
   const loginUserInfo = useSelector((state) => state.user.userInfo);
   const [chatText, setChatText] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
+  const [isSending, setIsSending] = useState(false);
+  const [isComposing, setIsComposing] = useState(false);
   const receiver = chatRoom.member.filter((m) => m !== loginUserInfo.username);
   const chatHistoryRef = useRef(null);
 
   useEffect(() => {
-    // 대화 가져오기
     const fetchChatHistory = async () => {
       try {
         const response = await axios.get(`/chat-history/${chatRoomId}`);
@@ -26,15 +27,12 @@ function ChatArea({ chatRoomId, chatRoom, setUpdate }) {
 
     fetchChatHistory();
 
-    // 새로운 메시지를 받을 때
     const handleNewMessage = (message) => {
       setChatHistory((prevChatHistory) => [...prevChatHistory, message]);
     };
+
     socket.on("new-message", handleNewMessage);
 
-    setUpdate(true);
-
-    // 소켓 연결끊기
     return () => {
       socket.off("new-message", handleNewMessage);
       socket.emit("leave-room", chatRoom.roomName);
@@ -42,14 +40,15 @@ function ChatArea({ chatRoomId, chatRoom, setUpdate }) {
   }, [chatRoomId, chatRoom.roomName, setUpdate]);
 
   useEffect(() => {
-    // 채팅 기록이 업데이트되면 스크롤을 가장 아래로 이동
     if (chatHistoryRef.current) {
       chatHistoryRef.current.scrollTop = chatHistoryRef.current.scrollHeight;
     }
   }, [chatHistory]);
 
   const handleSendMsg = async () => {
-    if (!chatText.trim()) return; // 공백 메시지 전송 방지
+    if (!chatText.trim() || isSending) return;
+
+    setIsSending(true);
 
     try {
       socket.emit("chat-msg", {
@@ -57,20 +56,30 @@ function ChatArea({ chatRoomId, chatRoom, setUpdate }) {
         roomName: chatRoom.roomName,
         parent_id: chatRoom._id,
         sender: loginUserInfo.username,
-        receiver: receiver.join(","), // 배열 -> string
+        receiver: receiver.join(","),
       });
 
-      // 채팅 텍스트 비우기
       setChatText("");
     } catch (error) {
       console.error("메시지 전송 오류:", error);
+    } finally {
+      setIsSending(false);
     }
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !isComposing) {
+      e.preventDefault(); // 기본 동작 방지
       handleSendMsg();
     }
+  };
+
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+
+  const handleCompositionEnd = () => {
+    setIsComposing(false);
   };
 
   return (
@@ -93,7 +102,6 @@ function ChatArea({ chatRoomId, chatRoom, setUpdate }) {
               >
                 {message.sender}
               </span>
-
               <span>{message.msg}</span>
               <br />
               <span className="bubble-date-info">{message.date}</span>
@@ -109,6 +117,8 @@ function ChatArea({ chatRoomId, chatRoom, setUpdate }) {
           value={chatText}
           onChange={(e) => setChatText(e.target.value)}
           onKeyDown={handleKeyDown}
+          onCompositionStart={handleCompositionStart}
+          onCompositionEnd={handleCompositionEnd}
         />
         <p className="send-msg-btn" onClick={handleSendMsg}>
           <img src="images/submit-btn-icon.png" alt="Send" />

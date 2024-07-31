@@ -46,7 +46,7 @@ io.on("connection", (socket) => {
         receiver: data.receiver,
         date: new Date(),
       });
-      console.log("메세지 디비 저장 성공");
+      console.log("메세지 디비 저장 성공 : " + data.msg);
       // 새로운 메세지 전송하기
       io.to(data.roomName).emit("new-message", {
         msg: data.msg,
