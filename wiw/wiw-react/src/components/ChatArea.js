@@ -24,15 +24,11 @@ function ChatArea({ chatRoomId, chatRoom, setUpdate }) {
         console.error("대화 이력 가져오기 실패:", error);
       }
     };
-
     fetchChatHistory();
-
     const handleNewMessage = (message) => {
       setChatHistory((prevChatHistory) => [...prevChatHistory, message]);
     };
-
     socket.on("new-message", handleNewMessage);
-
     return () => {
       socket.off("new-message", handleNewMessage);
       socket.emit("leave-room", chatRoom.roomName);
@@ -47,9 +43,7 @@ function ChatArea({ chatRoomId, chatRoom, setUpdate }) {
 
   const handleSendMsg = async () => {
     if (!chatText.trim() || isSending) return;
-
     setIsSending(true);
-
     try {
       socket.emit("chat-msg", {
         msg: chatText,
@@ -58,8 +52,8 @@ function ChatArea({ chatRoomId, chatRoom, setUpdate }) {
         sender: loginUserInfo.username,
         receiver: receiver.join(","),
       });
-
       setChatText("");
+      setUpdate(true);
     } catch (error) {
       console.error("메시지 전송 오류:", error);
     } finally {
@@ -69,7 +63,7 @@ function ChatArea({ chatRoomId, chatRoom, setUpdate }) {
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !isComposing) {
-      e.preventDefault(); // 기본 동작 방지
+      e.preventDefault();
       handleSendMsg();
     }
   };
