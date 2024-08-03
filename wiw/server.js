@@ -127,7 +127,6 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
-
 let connectDB = require("./database.js");
 const { ObjectId } = require("mongodb");
 const { error, timeStamp } = require("console");
