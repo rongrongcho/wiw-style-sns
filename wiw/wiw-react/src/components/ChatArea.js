@@ -24,15 +24,18 @@ function ChatArea({ chatRoomId, chatRoom, setUpdate }) {
       }
     };
     fetchChatHistory();
+
     const handleNewMessage = (message) => {
+      console.log("New message received:", message);
       setChatHistory((prevChatHistory) => [...prevChatHistory, message]);
     };
+
     socket.on("new-message", handleNewMessage);
     return () => {
       socket.off("new-message", handleNewMessage);
       socket.emit("leave-room", chatRoom.roomName);
     };
-  }, [chatRoomId, chatRoom.roomName, setUpdate]);
+  }, [chatRoomId, chatRoom.roomName, setUpdate, socket]);
 
   useEffect(() => {
     if (chatHistoryRef.current) {

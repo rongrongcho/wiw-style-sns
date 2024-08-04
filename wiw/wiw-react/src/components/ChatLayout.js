@@ -66,21 +66,18 @@ function ChatLayout() {
           <div className="chat-list-area">
             {myChatList.map((room) => (
               <div key={room._id} className="chat-room-menu">
-                {/* 채팅룸 제목 표시 (상대 username) */}
                 <a
                   onClick={() => {
-                    goToChatRoom(room); // 수정된 부분
+                    goToChatRoom(room);
                   }}
                 >
                   <p className="chat-room-title">
                     {getChatRoomTitle(room, loginUserInfo.username).join(", ")}
                   </p>
                   <p className="text-preview">
-                    "{/* 최신 메시지 미리보기 표시 */}
                     {room.textPreview
                       ? room.textPreview.msg
                       : "최신 메시지가 존재하지 않습니다."}
-                    "
                   </p>
                 </a>
               </div>
@@ -93,7 +90,7 @@ function ChatLayout() {
                   chatRoomId={chatRoomId}
                   chatRoom={chatRoom}
                   setUpdate={setUpdate}
-                />{" "}
+                />
               </div>
             ) : (
               <div className="no-select-room">채팅방을 선택하세요.</div>
